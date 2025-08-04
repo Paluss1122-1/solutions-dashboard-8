@@ -1,16 +1,27 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Supabase-Initialisierung für Netlify
-// Für Netlify müssen die Umgebungsvariablen über ein Script-Tag verfügbar gemacht werden
-const SUPABASE_URL = window.SUPABASE_URL || 'https://your-project.supabase.co';
-const SUPABASE_KEY = window.SUPABASE_KEY || 'your-anon-key';
+// Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_KEY = window.SUPABASE_KEY;
 
+// Prüfe, ob die Umgebungsvariablen verfügbar sind
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Supabase-Umgebungsvariablen sind nicht verfügbar. Bitte stellen Sie sicher, dass SUPABASE_URL und SUPABASE_KEY in Netlify konfiguriert sind.');
+}
+
+// Supabase-Client erstellen
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Nutzer aus Supabase laden
 let users = [];
 
 async function ladeUsers() {
+    if (!supabase) {
+        console.error('Supabase-Client ist nicht verfügbar');
+        return;
+    }
+    
     try {
         const { data, error } = await supabase
             .from('users')
