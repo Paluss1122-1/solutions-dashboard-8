@@ -1,8 +1,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Supabase-Initialisierung (ersetze durch deine eigenen Supabase-URL und API-Key)
-const SUPABASE_URL = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -175,7 +175,15 @@ async function update() {
 
         const maintenanceFrame = document.getElementById("maintenance-frame");
         if (maintenanceFrame) {
-            maintenanceFrame.style.display = showMaintenance ? "flex" : "none";
+            if (showMaintenance == true) {
+                maintenanceFrame.style.display = 'flex';
+                maintenanceFrame.style.opacity = '1'
+            } else {
+                maintenanceFrame.style.opacity = '1'
+                setTimeout(() => {
+                    maintenanceFrame.style.display = 'none';
+                }, 1000);
+            }
         }
         document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
         document.getElementById("why-ws").innerText = data.Grund;
