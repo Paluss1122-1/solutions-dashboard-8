@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Website-Analytics</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background-color: gray;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat {
+      background: rgb(234, 234, 234);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .visit-entry {
+      border-top: 1px solid #eee;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      border-bottom: 1px gray solid;
+    }
+  </style>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    
+    // Supabase Konfiguration
+    const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function ladeAnalytics() {
+      const container = document.getElementById("besuche");
+      container.innerHTML = "<p>Lade Analytics-Daten...</p>";
+
+      try {
+        const { data, error } = await supabase
+          .from("analytics")
+          .select("*")
+          .order("datum", { ascending: false });
+
+        if (error) {
+          container.innerHTML = `<p>Fehler beim Laden: ${error.message}</p>`;
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          container.innerHTML = "<p>Keine Analytics-Einträge gefunden.</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+        data.forEach(entry => {
+          const div = document.createElement("div");
+          div.className = "visit-entry";
+          div.innerHTML = `
+            <p><strong>ID:</strong> ${entry.id || "-"}</p>
+            <p>🕓 Zeit: ${entry.zeit || "-"}</p>
+            <p>🧭 Browser: ${entry.browser || "-"}</p>
+            <p>📱 Gerät: ${entry.device || "-"}</p>
+            <p>🌐 Website: ${entry.link || "-"}</p>
+            <p>👤 Person: ${entry.name || "-"}</p>
+            <p>👤 Aktion: ${entry.Action || "-"}</p>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (e) {
+        container.innerHTML = `<p>Fehler beim Laden der Daten: ${e.message}</p>`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", ladeAnalytics);
+  </script>
+</head>
+
+<body>
+  <h1>📊 Analytics-Einträge</h1>
+  <div class="stat">
+    <h2>Letzte Besuche (Supabase)</h2>
+    <div id="besuche"></div>
+  </div>
+</body>
+
+</html>
