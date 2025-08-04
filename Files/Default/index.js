@@ -116,50 +116,68 @@ bgsetting.onmouseleave = function () {
 function changebg(color) {
     const body = document.body;
 
-    localStorage.setItem('bg-color', color)
-    nutzerdatenAendern(founduser.username, { bgcolor: color })
+    localStorage.setItem('bg-color', color);
+    nutzerdatenAendern(founduser.username, { bgcolor: color });
 
     // Alle verfügbaren Buttons und ihre zugehörigen Farben
     const buttons = [
         { id: 'blackbg', gradient: 'linear-gradient(-45deg, black, gray)' },
+        { id: 'blackbg1', gradient: 'linear-gradient(-45deg, black, gray)' },
         { id: 'bluebg', gradient: 'linear-gradient(-45deg, blue, red)' },
+        { id: 'bluebg1', gradient: 'linear-gradient(-45deg, blue, red)' },
         { id: 'greenbg', gradient: 'linear-gradient(-45deg, green, yellow)' },
+        { id: 'greenbg1', gradient: 'linear-gradient(-45deg, green, yellow)' },
         { id: 'redbg', gradient: 'linear-gradient(-45deg, red, orange)' },
+        { id: 'redbg1', gradient: 'linear-gradient(-45deg, red, orange)' },
         { id: 'lilabg', gradient: 'linear-gradient(-45deg, purple, blue)' },
+        { id: 'lilabg1', gradient: 'linear-gradient(-45deg, purple, blue)' },
         { id: 'bluegreenbg', gradient: 'linear-gradient(-45deg, blue, green)' },
+        { id: 'bluegreenbg1', gradient: 'linear-gradient(-45deg, blue, green)' },
         { id: 'greenredbg', gradient: 'linear-gradient(-45deg, green, red)' },
+        { id: 'greenredbg1', gradient: 'linear-gradient(-45deg, green, red)' },
         { id: 'spinningbg', gradient: 'linear-gradient(-45deg, green, red)' },
+        { id: 'spinningbg1', gradient: 'linear-gradient(-45deg, green, red)' },
         { id: 'wavebg', gradient: 'linear-gradient(-45deg, green, red)' },
+        { id: 'wavebg1', gradient: 'linear-gradient(-45deg, green, red)' },
         { id: 'rainbg', gradient: 'linear-gradient(-45deg, green, red)' },
+        { id: 'rainbg1', gradient: 'linear-gradient(-45deg, green, red)' },
         { id: 'slidebg', gradient: 'linear-gradient(-45deg, green, red)' },
+        { id: 'slidebg1', gradient: 'linear-gradient(-45deg, green, red)' },
     ];
 
-    if (color == 'spinning') {
+    // Hilfsfunktion für das Umschalten der Button-Auswahl
+    function updateButtonSelection(selectedColor) {
+        buttons.forEach((button) => {
+            const element = document.getElementById(button.id);
+            if (!element) return;
+    
+            if (button.id.startsWith(selectedColor)) {
+                element.classList.add('selected');
+                element.classList.remove('notselected');
+            } else {
+                element.classList.remove('selected');
+                element.classList.add('notselected');
+            }
+        });
+    }
+    
+
+    // Hilfsfunktion für das Black-Overlay und das Laden des Iframes
+    function handleSpecialBg(bgName, scale, src) {
         black.style.display = 'block';
         black.style.opacity = '0';
         black.style.transition = 'opacity 1s';
         black.style.zIndex = -10;
         void black.offsetWidth;
         black.style.opacity = '1';
-        buttons.forEach((button) => {
-            const element = document.getElementById(button.id);
-            if (element) {
-                if (button.id === 'spinningbg') {
-                    element.classList.add('selected');
-                    element.classList.remove('notselected');
-                } else {
-                    element.classList.remove('selected');
-                    element.classList.add('notselected');
-                }
-            }
-        });
+        updateButtonSelection(bgName + 'bg');
         bgiframe.addEventListener('load', function handler() {
             bgiframe.removeEventListener('load', handler);
             setTimeout(() => {
                 bgiframe.style.display = 'block';
                 bgiframe.style.transition = 'opacity 1s, filter 2s';
                 bgiframe.style.opacity = '1';
-                bgiframe.style.transform = 'scale(5)';
+                bgiframe.style.transform = scale;
                 black.style.transition = 'opacity 1s';
                 black.style.opacity = '0';
                 black.addEventListener('transitionend', function handler2() {
@@ -169,132 +187,31 @@ function changebg(color) {
             }, 500);
         });
         setTimeout(() => {
-            bgiframe.setAttribute('src', 'LoadingScreen/Spinning Circle/index.html');
+            bgiframe.setAttribute('src', src);
         }, 1000);
+    }
+
+    if (color === 'spinning') {
+        handleSpecialBg('spinning', 'scale(5)', 'LoadingScreen/Spinning Circle/index.html');
         return;
-    } else if (color == 'wave') {
-        black.style.display = 'block';
-        black.style.opacity = '0';
-        black.style.transition = 'opacity 1s';
-        black.style.zIndex = -10;
-        void black.offsetWidth;
-        black.style.opacity = '1';
-        buttons.forEach((button) => {
-            const element = document.getElementById(button.id);
-            if (element) {
-                if (button.id === 'wavebg') {
-                    element.classList.add('selected');
-                    element.classList.remove('notselected');
-                } else {
-                    element.classList.remove('selected');
-                    element.classList.add('notselected');
-                }
-            }
-        });
-        bgiframe.addEventListener('load', function handler() {
-            bgiframe.removeEventListener('load', handler);
-            setTimeout(() => {
-                bgiframe.style.display = 'block';
-                bgiframe.style.transition = 'opacity 1s, filter 2s';
-                bgiframe.style.opacity = '1';
-                bgiframe.style.transform = 'scale(1)';
-                black.style.transition = 'opacity 1s';
-                black.style.opacity = '0';
-                black.addEventListener('transitionend', function handler2() {
-                    black.style.display = 'none';
-                    black.removeEventListener('transitionend', handler2);
-                });
-            }, 500);
-        });
-        setTimeout(() => {
-            bgiframe.setAttribute('src', 'LoadingScreen/Wave/index.html');
-        }, 1000);
+    } else if (color === 'wave') {
+        handleSpecialBg('wave', 'scale(1)', 'LoadingScreen/Wave/index.html');
         return;
-    } else if (color == 'rain') {
-        black.style.display = 'block';
-        black.style.opacity = '0';
-        black.style.transition = 'opacity 1s';
-        black.style.zIndex = -10;
-        void black.offsetWidth;
-        black.style.opacity = '1';
-        buttons.forEach((button) => {
-            const element = document.getElementById(button.id);
-            if (element) {
-                if (button.id === 'rainbg') {
-                    element.classList.add('selected');
-                    element.classList.remove('notselected');
-                } else {
-                    element.classList.remove('selected');
-                    element.classList.add('notselected');
-                }
-            }
-        });
-        bgiframe.addEventListener('load', function handler() {
-            bgiframe.removeEventListener('load', handler);
-            setTimeout(() => {
-                bgiframe.style.display = 'block';
-                bgiframe.style.transition = 'opacity 1s, filter 2s';
-                bgiframe.style.opacity = '1';
-                bgiframe.style.transform = 'scale(1)';
-                black.style.transition = 'opacity 1s';
-                black.style.opacity = '0';
-                black.addEventListener('transitionend', function handler2() {
-                    black.style.display = 'none';
-                    black.removeEventListener('transitionend', handler2);
-                });
-            }, 500);
-        });
-        setTimeout(() => {
-            bgiframe.setAttribute('src', 'LoadingScreen/Rain/index.html');
-        }, 1000);
+    } else if (color === 'rain') {
+        handleSpecialBg('rain', 'scale(1)', 'LoadingScreen/Rain/index.html');
         return;
-    } else if (color == 'slide') {
-        black.style.display = 'block';
-        black.style.opacity = '0';
-        black.style.transition = 'opacity 1s';
-        black.style.zIndex = -10;
-        void black.offsetWidth;
-        black.style.opacity = '1';
-        buttons.forEach((button) => {
-            const element = document.getElementById(button.id);
-            if (element) {
-                if (button.id === 'slidebg') {
-                    element.classList.add('selected');
-                    element.classList.remove('notselected');
-                } else {
-                    element.classList.remove('selected');
-                    element.classList.add('notselected');
-                }
-            }
-        });
-        bgiframe.addEventListener('load', function handler() {
-            bgiframe.removeEventListener('load', handler);
-            setTimeout(() => {
-                bgiframe.style.display = 'block';
-                bgiframe.style.transition = 'opacity 1s, filter 2s';
-                bgiframe.style.opacity = '1';
-                bgiframe.style.transform = 'scale(1)';
-                black.style.transition = 'opacity 1s';
-                black.style.opacity = '0';
-                black.addEventListener('transitionend', function handler2() {
-                    black.style.display = 'none';
-                    black.removeEventListener('transitionend', handler2);
-                });
-            }, 500);
-        });
-        setTimeout(() => {
-            bgiframe.setAttribute('src', 'LoadingScreen/Sliding Diagonals/index.html');
-        }, 1000);
+    } else if (color === 'slide') {
+        handleSpecialBg('slide', 'scale(1)', 'LoadingScreen/Sliding Diagonals/index.html');
         return;
     }
 
-    const selectedButton = buttons.find((button) =>
-        button.id.includes(color)
-    );
+    // Für normale Farbverläufe
+    const selectedButton = buttons.find((button) => button.id.includes(color));
 
     if (selectedButton) {
-        if (color !== 'spinning' || color !== 'wave' || color !== 'rain' || color !== 'slide') {
-            bgiframe.style.opacity = '0'
+        // Korrigierte Bedingung: Nur wenn NICHT einer der Spezialtypen, dann iframe ausblenden
+        if (!['spinning', 'wave', 'rain', 'slide'].includes(color)) {
+            bgiframe.style.opacity = '0';
             bgiframe.setAttribute('src', ' ');
         }
         black.style.display = 'block';
@@ -302,18 +219,7 @@ function changebg(color) {
         black.style.transition = 'opacity 1s';
         void black.offsetWidth;
         black.style.opacity = '1';
-        buttons.forEach((button) => {
-            const element = document.getElementById(button.id);
-            if (element) {
-                if (button.id === selectedButton.id) {
-                    element.classList.add('selected');
-                    element.classList.remove('notselected');
-                } else {
-                    element.classList.remove('selected');
-                    element.classList.add('notselected');
-                }
-            }
-        });
+        updateButtonSelection(selectedButton.id);
         setTimeout(() => {
             body.style.background = selectedButton.gradient;
             body.style.animation = 'none';

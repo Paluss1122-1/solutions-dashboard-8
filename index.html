@@ -5,8 +5,13 @@
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Dashboard</title>
-    <link rel='icon' href='favicon.ico' />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
     <link rel="stylesheet" href="Files/Style/style.css">
+    <script>
+        (function () { if (!window.chatbase || window.chatbase("getState") !== "initialized") { window.chatbase = (...arguments) => { if (!window.chatbase.q) { window.chatbase.q = [] } window.chatbase.q.push(arguments) }; window.chatbase = new Proxy(window.chatbase, { get(target, prop) { if (prop === "q") { return target.q } return (...args) => target(prop, ...args) } }) } const onLoad = function () { const script = document.createElement("script"); script.src = "https://www.chatbase.co/embed.min.js"; script.id = "G3lrHnnj6OSR2IaHA1iR8"; script.domain = "www.chatbase.co"; document.body.appendChild(script) }; if (document.readyState === "complete") { onLoad() } else { window.addEventListener("load", onLoad) } })();
+    </script>
 </head>
 
 <body>
@@ -206,59 +211,59 @@
                     </label>
 
                     <div>
-                        <button type='button' id='spinningbg' class='selected' style='background: gray; color: black;'
+                        <button type='button' id='spinningbg1' class='selected' style='background: gray; color: black;'
                             onclick='changebg("spinning")'>
                             Drehender Kreis
                         </button>
 
-                        <button type='button' id='wavebg' class='notselected' style='background: gray; color: black;'
+                        <button type='button' id='wavebg1' class='notselected' style='background: gray; color: black;'
                             onclick='changebg("wave")'>
                             Welle
                         </button>
 
-                        <button type='button' id='rainbg' class='notselected' style='background: gray; color: black;'
+                        <button type='button' id='rainbg1' class='notselected' style='background: gray; color: black;'
                             onclick='changebg("rain")'>
                             Regen
                         </button>
 
-                        <button type='button' id='slidebg' class='notselected' style='background: gray; color: black;'
+                        <button type='button' id='slidebg1' class='notselected' style='background: gray; color: black;'
                             onclick='changebg("slide")'>
                             Slidende Diagonalen
                         </button>
 
-                        <button type='button' id='blackbg' class='notselected'
+                        <button type='button' id='blackbg1' class='notselected'
                             style='background: linear-gradient(to right, rgb(17, 17, 17), gray)'
                             onclick='changebg("black")'>
                             Schwarz - Grau
                         </button>
-                        <button type='button' id='bluebg' class='notselected'
+                        <button type='button' id='bluebg1' class='notselected'
                             style='background: linear-gradient(to right, blue, red)' onclick='changebg("blue")'>
                             Blau - Rot
                         </button>
-                        <button type='button' id='greenbg' class='notselected'
+                        <button type='button' id='greenbg1' class='notselected'
                             style='background: linear-gradient(to right, Green, Yellow); color: black;'
                             onclick='changebg("green")'>
                             Grün - Gelb
                         </button>
-                        <button type='button' id='redbg' class='notselected'
+                        <button type='button' id='redbg1' class='notselected'
                             style='background: linear-gradient(to right, red, orange); color: black;'
                             onclick='changebg("red")'>
                             Rot - Orange
                         </button>
 
-                        <button type='button' id='lilabg' class='notselected'
+                        <button type='button' id='lilabg1' class='notselected'
                             style='background: linear-gradient(to right, purple, blue); color: white;'
                             onclick='changebg("lila")'>
                             Lila - Blau
                         </button>
 
-                        <button type='button' id='bluegreenbg' class='notselected'
+                        <button type='button' id='bluegreenbg1' class='notselected'
                             style='background: linear-gradient(to right, blue, green); color: white;'
                             onclick='changebg("bluegreen")'>
                             Blau - Grün
                         </button>
 
-                        <button type='button' id='greenredbg' class='notselected'
+                        <button type='button' id='greenredbg1' class='notselected'
                             style='background: linear-gradient(to right, green, red); color: white;'
                             onclick='changebg("greenred")'>
                             Grün - Rot

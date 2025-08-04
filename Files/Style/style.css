@@ -195,6 +195,7 @@ body {
     display: none;
     opacity: 0;
     transition: opacity 1s;
+    top: 0;
 }
 
 .intro-title {
