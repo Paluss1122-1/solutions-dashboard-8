@@ -6,12 +6,29 @@ const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
 
 // Prüfe, ob die Umgebungsvariablen verfügbar sind
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.error('Supabase-Umgebungsvariablen sind nicht verfügbar. Bitte stellen Sie sicher, dass SUPABASE_URL und SUPABASE_KEY in Netlify konfiguriert sind.');
+if (!SUPABASE_URL || SUPABASE_URL === '%SUPABASE_URL%' || SUPABASE_URL === 'https://your-project.supabase.co') {
+    console.error('Supabase-URL ist nicht korrekt konfiguriert. Bitte stellen Sie sicher, dass SUPABASE_URL in Netlify konfiguriert ist.');
+    console.error('Aktuelle URL:', SUPABASE_URL);
 }
 
-// Supabase-Client erstellen
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+if (!SUPABASE_KEY || SUPABASE_KEY === '%SUPABASE_KEY%' || SUPABASE_KEY === 'your-anon-key') {
+    console.error('Supabase-Key ist nicht korrekt konfiguriert. Bitte stellen Sie sicher, dass SUPABASE_KEY in Netlify konfiguriert ist.');
+}
+
+// Supabase-Client erstellen nur wenn gültige Werte vorhanden sind
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_KEY && 
+    SUPABASE_URL !== '%SUPABASE_URL%' && SUPABASE_URL !== 'https://your-project.supabase.co' &&
+    SUPABASE_KEY !== '%SUPABASE_KEY%' && SUPABASE_KEY !== 'your-anon-key') {
+    try {
+        supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('Supabase-Client erfolgreich erstellt');
+    } catch (error) {
+        console.error('Fehler beim Erstellen des Supabase-Clients:', error);
+    }
+} else {
+    console.warn('Supabase-Client wird nicht erstellt - Umgebungsvariablen nicht verfügbar');
+}
 
 // Nutzer aus Supabase laden
 let users = [];

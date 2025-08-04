@@ -296,8 +296,13 @@
     </div>
     <script>
         // Netlify-Umgebungsvariablen für Supabase verfügbar machen
-        window.SUPABASE_URL = '%SUPABASE_URL%';
-        window.SUPABASE_KEY = '%SUPABASE_KEY%';
+        // Fallback für lokale Entwicklung
+        window.SUPABASE_URL = "{{ SUPABASE_URL }}";
+        window.SUPABASE_KEY = "{{ SUPABASE_KEY }}";
+
+        // Debug-Ausgabe
+        console.log('Supabase URL:', window.SUPABASE_URL);
+        console.log('Supabase Key verfügbar:', !!window.SUPABASE_KEY);
     </script>
     <script type='module' src="Files/Module/index.js"></script>
     <script src="Files/Default/index.js"></script>
