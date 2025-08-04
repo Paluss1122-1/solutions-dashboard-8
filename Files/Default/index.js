@@ -276,6 +276,11 @@ function start() {
             newlink2.setAttribute('href', 'Admin/user-management.html');
             newlink2.innerHTML = '<span>Nutzer Verwaltung</span>'
             linkcontainer.appendChild(newlink2);
+            //Einstellungen
+            let newlink3 = document.createElement('a');
+            newlink3.setAttribute('href', 'Admin/settings.html');
+            newlink3.innerHTML = '<span>Einstellungen</span>'
+            linkcontainer.appendChild(newlink3);
         }
 
         if (localStorage.getItem('allowedcookies') && !founduser.allowedcookies) {

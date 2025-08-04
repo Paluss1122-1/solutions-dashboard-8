@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System-Einstellungen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .settings-section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .setting-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .setting-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .edit-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background: #0056b3;
+        }
+
+        .setting-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: #333;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .refresh-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #1e7e34;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background-color: #28a745;
+        }
+
+        .status-inactive {
+            background-color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .setting-details {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ System-Einstellungen</h1>
+            <p>Verwalten Sie alle System- und Datenbankeinstellungen</p>
+        </div>
+
+        <div class="content">
+            <button class="refresh-btn" onclick="ladeEinstellungen()">🔄 Einstellungen neu laden</button>
+
+            <div id="message"></div>
+            <div id="loading" class="loading">Lade Einstellungen...</div>
+
+            <!-- Allgemeine Einstellungen -->
+            <div class="settings-section">
+                <h2 class="section-title">⚙️ Allgemeine Einstellungen</h2>
+                <div id="generalSettings"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal für Bearbeitung -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Einstellung bearbeiten</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+
+            <form id="editForm">
+                <div class="form-group">
+                    <label class="form-label">Einstellungsname:</label>
+                    <input type="text" id="editSettingName" class="form-input" readonly>
+                </div>
+
+                                 <div class="form-group">
+                     <label class="form-label">Wert:</label>
+                     <div id="valueInputContainer">
+                         <input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">
+                     </div>
+                 </div>
+
+
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Speichern</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        // Supabase Konfiguration
+        const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE";
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let settings = [];
+        let currentEditSetting = null;
+
+        // Standardeinstellungen definieren
+        const defaultSettings = {
+            general: {
+                Wartungsarbeiten: false,
+                WartungsarbeitenZeit: "",
+                Grund: "",
+                Version: "1.0.0"
+            }
+        };
+
+        // Funktion zum Laden der Einstellungen
+        window.ladeEinstellungen = async function () {
+            const loadingDiv = document.getElementById('loading');
+            const messageDiv = document.getElementById('message');
+
+            loadingDiv.style.display = 'block';
+            messageDiv.innerHTML = '';
+
+            try {
+                // Lade allgemeine Einstellungen aus der general Tabelle
+                const { data: generalData, error: generalError } = await supabase
+                    .from('general')
+                    .select('*');
+
+                let allSettings = flattenSettings(defaultSettings);
+
+                // Allgemeine Einstellungen verarbeiten
+                if (!generalError && generalData && generalData.length > 0) {
+                    const generalSettings = generalData[0]; // Nehme den ersten Eintrag
+                    allSettings = allSettings.map(setting => {
+                        if (setting.category === 'general') {
+                            // Verwende den Einstellungsnamen direkt als Schlüssel
+                            if (generalSettings[setting.name] !== undefined) {
+                                return {
+                                    ...setting,
+                                    value: generalSettings[setting.name],
+                                    type: typeof generalSettings[setting.name]
+                                };
+                            }
+                        }
+                        return setting;
+                    });
+                }
+
+                settings = allSettings;
+                zeigeEinstellungen(settings);
+
+            } catch (error) {
+                zeigeNachricht(`Fehler beim Laden der Einstellungen: ${error.message}`, 'error');
+                // Fallback zu Standardeinstellungen
+                settings = flattenSettings(defaultSettings);
+                zeigeEinstellungen(settings);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        // Funktion zum Abflachen der Einstellungen
+        function flattenSettings(obj, prefix = '') {
+            const result = [];
+            for (const [key, value] of Object.entries(obj)) {
+                const fullKey = prefix ? `${prefix}.${key}` : key;
+                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                    result.push(...flattenSettings(value, fullKey));
+                } else {
+                    result.push({
+                        name: key, // Nur den Schlüssel ohne Prefix verwenden
+                        value: value,
+                        type: typeof value,
+                        description: getSettingDescription(key),
+                        category: prefix || 'general'
+                    });
+                }
+            }
+            return result;
+        }
+
+        // Funktion zum Generieren von Beschreibungen
+        function getSettingDescription(key) {
+            const descriptions = {
+                'Wartungsarbeiten': 'Wartungsarbeiten aktiviert/deaktiviert',
+                'WartungsarbeitenZeit': 'Zeitpunkt der Wartungsarbeiten',
+                'Grund': 'Grund für die Wartungsarbeiten',
+                'Version': 'Aktuelle Systemversion'
+            };
+            return descriptions[key] || `Einstellung für ${key}`;
+        }
+
+        // Funktion zum Anzeigen der Einstellungen
+        function zeigeEinstellungen(einstellungenListe) {
+            const categories = {
+                general: document.getElementById('generalSettings')
+            };
+
+            // Alle Kategorien leeren
+            Object.values(categories).forEach(container => {
+                container.innerHTML = '';
+            });
+
+            if (einstellungenListe.length === 0) {
+                Object.values(categories).forEach(container => {
+                    container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Keine Einstellungen gefunden.</p>';
+                });
+                return;
+            }
+
+            // Einstellungen nach Kategorien gruppieren
+            const groupedSettings = {};
+            einstellungenListe.forEach(setting => {
+                const category = setting.category;
+                if (!groupedSettings[category]) {
+                    groupedSettings[category] = [];
+                }
+                groupedSettings[category].push(setting);
+            });
+
+            // Einstellungen in entsprechenden Containern anzeigen
+            Object.entries(groupedSettings).forEach(([category, settings]) => {
+                const container = categories[category];
+                if (container) {
+                    container.innerHTML = settings.map(setting => `
+            <div class="setting-item">
+              <div class="setting-header">
+                <div class="setting-name">${setting.name}</div>
+                <button class="edit-btn" onclick="bearbeiteEinstellung('${setting.name}')">✏️ Bearbeiten</button>
+              </div>
+              <div class="setting-details">
+                <div class="detail-item">
+                  <div class="detail-label">Wert:</div>
+                  <div class="detail-value">
+                    ${formatSettingValue(setting.value, setting.type)}
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          `).join('');
+                }
+            });
+        }
+
+        // Funktion zum Formatieren der Einstellungswerte
+        function formatSettingValue(value, type) {
+            if (value === null || value === undefined) {
+                return '<em>nicht gesetzt</em>';
+            }
+
+            switch (type) {
+                case 'boolean':
+                    return value ? '✅ Aktiviert' : '❌ Deaktiviert';
+                case 'number':
+                    return value.toString();
+                case 'string':
+                    if (value.length > 50) {
+                        return value.substring(0, 50) + '...';
+                    }
+                    return value;
+                case 'json':
+                    try {
+                        return JSON.stringify(JSON.parse(value), null, 2);
+                    } catch {
+                        return value;
+                    }
+                default:
+                    return value.toString();
+            }
+        }
+
+        // Funktion zum Bearbeiten einer Einstellung
+        window.bearbeiteEinstellung = function (settingName) {
+            const setting = settings.find(s => s.name === settingName);
+            if (!setting) {
+                zeigeNachricht('Einstellung nicht gefunden!', 'error');
+                return;
+            }
+
+            currentEditSetting = setting;
+
+                         // Formular mit aktuellen Werten füllen
+             document.getElementById('editSettingName').value = setting.name;
+             
+             // Dynamisches Input-Feld basierend auf Einstellungstyp
+             const valueContainer = document.getElementById('valueInputContainer');
+             const textInput = document.getElementById('editSettingValue');
+             
+             if (setting.name === 'Wartungsarbeiten') {
+                 // Checkbox für Boolean-Werte
+                 valueContainer.innerHTML = `
+                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                         <input type="checkbox" id="editSettingValue" ${setting.value ? 'checked' : ''} style="width: 20px; height: 20px;">
+                         <span>Wartungsarbeiten aktiviert</span>
+                     </label>
+                 `;
+             } else {
+                 // Text-Input für andere Werte
+                 valueContainer.innerHTML = `<input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">`;
+                 document.getElementById('editSettingValue').value = setting.value;
+             }
+
+            // Modal öffnen
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Funktion zum Schließen des Modals
+        window.closeModal = function () {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditSetting = null;
+        }
+
+        // Funktion zum Anzeigen von Nachrichten
+        function zeigeNachricht(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+
+            // Nachricht nach 5 Sekunden ausblenden
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Event Listener für das Formular
+        document.getElementById('editForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (!currentEditSetting) {
+                zeigeNachricht('Keine Einstellung zum Bearbeiten ausgewählt!', 'error');
+                return;
+            }
+
+                         // Wert abrufen basierend auf Input-Typ
+             let newValue;
+             if (currentEditSetting.name === 'Wartungsarbeiten') {
+                 // Checkbox-Wert
+                 newValue = document.getElementById('editSettingValue').checked;
+             } else {
+                 // Text-Input-Wert
+                 newValue = document.getElementById('editSettingValue').value;
+             }
+
+             // Wert validieren basierend auf Typ
+             let validatedValue = newValue;
+             try {
+                 switch (currentEditSetting.type) {
+                     case 'number':
+                         validatedValue = parseFloat(newValue);
+                         if (isNaN(validatedValue)) {
+                             throw new Error('Ungültige Zahl');
+                         }
+                         break;
+                     case 'boolean':
+                         validatedValue = newValue; // Bereits Boolean von Checkbox
+                         break;
+                     case 'json':
+                         validatedValue = JSON.parse(newValue);
+                         break;
+                 }
+             } catch (error) {
+                 zeigeNachricht(`Fehler bei der Validierung: ${error.message}`, 'error');
+                 return;
+             }
+
+            const updatedSetting = {
+                ...currentEditSetting,
+                value: validatedValue
+            };
+
+            try {
+                // Speichere in der general Tabelle
+                const key = updatedSetting.name; // Verwende den Einstellungsnamen direkt
+
+                // Prüfe ob bereits ein Eintrag in der general Tabelle existiert
+                const { data: existingData } = await supabase
+                    .from('general')
+                    .select('*')
+                    .limit(1);
+
+                if (existingData && existingData.length > 0) {
+                    // Update bestehenden Eintrag
+                    const { error } = await supabase
+                        .from('general')
+                        .update({ [key]: updatedSetting.value })
+                        .eq('id', existingData[0].id);
+
+                    if (error) {
+                        throw new Error(`Fehler beim Speichern in general Tabelle: ${error.message}`);
+                    }
+                } else {
+                    // Erstelle neuen Eintrag
+                    const { error } = await supabase
+                        .from('general')
+                        .insert({ [key]: updatedSetting.value });
+
+                    if (error) {
+                        throw new Error(`Fehler beim Erstellen in general Tabelle: ${error.message}`);
+                    }
+                }
+
+                // Lokale Daten aktualisieren
+                const settingIndex = settings.findIndex(s => s.name === currentEditSetting.name);
+                if (settingIndex !== -1) {
+                    settings[settingIndex] = updatedSetting;
+                }
+
+                zeigeNachricht('Einstellung erfolgreich aktualisiert!', 'success');
+                closeModal();
+                zeigeEinstellungen(settings);
+
+            } catch (error) {
+                zeigeNachricht(`Fehler beim Speichern: ${error.message}`, 'error');
+            }
+        });
+
+        // Modal schließen beim Klick außerhalb
+        window.onclick = function (event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // ESC-Taste zum Schließen des Modals
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initial laden
+        window.addEventListener('DOMContentLoaded', ladeEinstellungen);
+    </script>
+</body>
+
+</html>
