@@ -1,8 +1,9 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// Supabase-Initialisierung (ersetze durch deine eigenen Supabase-URL und API-Key)
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+// Supabase-Initialisierung für Netlify
+// Für Netlify müssen die Umgebungsvariablen über ein Script-Tag verfügbar gemacht werden
+const SUPABASE_URL = window.SUPABASE_URL || 'https://your-project.supabase.co';
+const SUPABASE_KEY = window.SUPABASE_KEY || 'your-anon-key';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
