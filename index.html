@@ -185,7 +185,7 @@
                 onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; document.getElementById("login-container").style.opacity = "0"; setTimeout(() => { document.getElementById("login-form-5").style.display = "none"; document.getElementById("login-form-4").style.display = "block"; document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
         </form>
     </div>
-    <div id='dashboard' style='display: none; opacity: 0;'>
+    <div id='dashboard' style='display: none; opacity: 0; position: relative;'>
         <h1 style='animation: colorchange 2s ease-in-out; color: white;'>
             <span id='Begrüßung'></span> <span id='usname'></span><span id='f'></span>
         </h1>
@@ -198,14 +198,44 @@
             <a href='https://games-paluss1122.netlify.app/' id='games-website'><span>Spiele</span></a>
         </div>
     </div>
-    <button class='settings' onclick='settings()' id='shopbt' style='transform: scale(1); display: none;'>
+
+    <!-- Tutorial Overlay -->
+    <div id='tutorial-overlay'
+        style='display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999997; transition: opacity 1s; opacity: 0;'>
+
+    </div>
+    <div id='tutorial-content'
+        style='position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2d2d2d; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center; color: white; z-index: 999999; display: none;transition: opacity 1s; opacity: 0;'>
+        <h2 id='tutorial-title' style='margin-bottom: 20px; color: #ff6b6b; margin-top: 0;'>Willkommen beim Dashboard!
+            👋</h2>
+        <p id='tutorial-text' style='font-size: 18px; line-height: 1.5; margin-bottom: 25px;'>Lass mich dir zeigen, wie
+            du die wichtigsten Funktionen nutzen kannst.</p>
+        <div id='tutorial-step' style='margin-bottom: 25px;'>
+
+        </div>
+        <div style='display: flex; justify-content: space-between; gap: 10px;'>
+            <button id='tutorial-prev' onclick='stutorialPrev()'
+                style='padding: 10px 20px; background: #666; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>Zurück</button>
+            <button id='tutorial-next' onclick='stutorialNext()'
+                style='padding: 10px 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>Weiter</button>
+            <button id='tutorial-skip' onclick='stutorialSkip()'
+                style='padding: 10px 20px; background: #444; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>Überspringen</button>
+        </div>
+    </div>
+
+    <div id='tutorial-highlight'
+        style='position: fixed; border: 3px solid #ff6b6b; border-radius: 10px; background: rgba(255,107,107,0.1); pointer-events: none; z-index: 10000000000; display: none;'>
+    </div>
+
+    <button class='settings' onclick='settings()' id='shopbt'
+        style='transform: scale(1); display: none; bottom: 0; left: 0;'>
         <img src='settings.png' class='shopimg' alt='settings image' />
     </button>
     <div id='settingsframe' style='display: none; opacity: 0;' class='settingsframe'>
         <div class='offer' style='border-radius: 50px 50px 0px 0px'>
             <h4 style='margin: 0; font-size: 30px'><u>Hintergrund</u></h4>
             <div class='offer' style='margin: 0; padding-bottom: 0'>
-                <form id='bg-setting' style='display: block;'>
+                <form id='bg-setting' style='display: block; position: relative;'>
                     <label for='password' style='margin-top: 0;'>Welchen Hintergrund möchtest du haben? <span
                             style='color: gray;'>(Kann später in den Einstellungen nochmal geändert werden)</span>
                     </label>
@@ -278,9 +308,12 @@
                         type='submit'>Speichern</button>
                 </form>
                 <br>
-                <button onclick='localStorage.clear(); window.location.reload()' style='margin-bottom: 50px'>
+                <button onclick='localStorage.clear(); window.location.reload()' style='margin-bottom: 20px'>
                     Fehlerbehebung mit Einstellungen + Abmeldung + Einstellungen werden
                     zurückgesetzt
+                </button>
+                <button onclick='resetTutorial(); settings();' style='margin-bottom: 50px; background-color: #ff6b6b;'>
+                    Tutorial erneut starten
                 </button>
             </div>
         </div>
@@ -299,12 +332,6 @@
             <img src='green-arrow.webp' alt='' class='green-arrow' style='z-index: 100000000000' />
         </button>
     </div>
-    <script>
-
-        // Debug-Ausgabe
-        console.log('Supabase URL:', window.SUPABASE_URL);
-        console.log('Supabase Key verfügbar:', !!window.SUPABASE_KEY);
-    </script>
     <script type='module' src="Files/Module/index.js"></script>
     <script src="Files/Default/index.js"></script>
 </body>

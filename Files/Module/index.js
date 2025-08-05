@@ -25,7 +25,6 @@ async function ladeUsers() {
         }
 
         users = data || [];
-        console.log('Geladene Nutzer:', users);
         window.users = users;
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
@@ -66,10 +65,8 @@ async function nutzerdatenAendern(username, neueDaten) {
             founduser = { ...founduser, ...neueDaten };
         }
 
-        console.log('Nutzerdaten erfolgreich aktualisiert:', data);
         return true;
     } catch (err) {
-        console.error('Unerwarteter Fehler beim Ändern der Nutzerdaten:', err);
         return false;
     }
 }
@@ -94,7 +91,6 @@ function getBrowserName() {
 
 window.SendAnalyticsStep = async function (action) {
     let user = null;
-    window.console.log(action);
     try {
         user = window.founduser.username;
     } catch (e) {

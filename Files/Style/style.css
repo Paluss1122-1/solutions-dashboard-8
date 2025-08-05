@@ -43,6 +43,7 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: opacity 1s;
     text-align: center;
+    position: relative;
 }
 
 #login-container h2 {
@@ -353,8 +354,6 @@ body {
         color: white;
     }
 }
-
-
 
 .settings {
     width: 100px;

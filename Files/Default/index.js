@@ -26,6 +26,222 @@ const infotext = document.getElementById('info-text');
 const username = document.getElementById('username');
 const password = document.getElementById('password');
 const displayname = document.getElementById('displayname');
+// Besseres Laden: Wiederholt prüfen, bis das Element existiert, dann zIndex setzen
+function warteAufBubbleButton(versuche = 0) {
+    const bubblebt = document.getElementById('chatbase-bubble-button');
+    if (bubblebt) {
+        bubblebt.style.zIndex = '0';
+        bubblebt.onclick = function () {
+            SendAnalyticsStep('Chatbot geöffnet')
+        }
+    } else if (versuche < 20) { // Maximal 20 Versuche (ca. 10 Sekunden)
+        setTimeout(() => {
+            warteAufBubbleButton(versuche + 1);
+        }, 500);
+    }
+}
+warteAufBubbleButton();
+
+// Tutorial Variablen
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialTitle = document.getElementById('tutorial-title');
+const tutorialText = document.getElementById('tutorial-text');
+const tutorialHighlight = document.getElementById('tutorial-highlight');
+const tutorialPrev = document.getElementById('tutorial-prev');
+const tutorialNext = document.getElementById('tutorial-next');
+const tutorialSkip = document.getElementById('tutorial-skip');
+const tutorialcontent = document.getElementById('tutorial-content')
+
+let tutorialStep = 0;
+const tutorialSteps = [
+    {
+        title: 'Willkommen beim Dashboard!',
+        text: 'Lass mich dir zeigen, wie du die wichtigsten Funktionen nutzen kannst.',
+        highlight: null
+    },
+    {
+        title: 'Navigation zu den Einstellungen ⚙️',
+        text: 'Hier findest du die Einstellungen. Klicke auf das Zahnrad-Symbol unten links, um deine persönlichen Einstellungen zu ändern.',
+        highlight: 'shopbt'
+    },
+    {
+        title: 'Hintergrund anpassen 🎨',
+        text: 'In den Einstellungen kannst du deinen Hintergrund ändern. Wähle zwischen verschiedenen Animationen und Farbverläufen.',
+        highlight: 'bg-setting'
+    },
+    {
+        title: 'Nutzername ändern 👤',
+        text: 'Du kannst auch deinen Anzeigenamen in den Einstellungen ändern, falls du das möchtest.',
+        highlight: null
+    },
+    {
+        title: 'Dashboard erkunden 🚀',
+        text: 'Hier findest du alle wichtigen Links und Funktionen. Du kannst jederzeit zu den Einstellungen zurückkehren.',
+        highlight: 'dashboard'
+    },
+    {
+        title: 'Tutorial abgeschlossen! ✅',
+        text: 'Perfekt! Du weißt jetzt, wie du zu den Einstellungen gelangst. Viel Spaß beim Erkunden deines Dashboards!',
+        highlight: null
+    }
+];
+
+// Tutorial Funktionen
+function startTutorial() {
+    if (localStorage.getItem('tutorial-completed')) {
+        return; // Tutorial bereits abgeschlossen
+    }
+
+    tutorialStep = 0;
+    tutorialOverlay.style.display = 'block';
+    tutorialcontent.style.display = 'block';
+    setTimeout(() => {
+        tutorialOverlay.style.transition = 'opacity 1s';
+        tutorialOverlay.style.opacity = '1';
+        tutorialcontent.style.transition = 'opacity 1s';
+        tutorialcontent.style.opacity = '1';
+    }, 10);
+    updateTutorialStep();
+}
+
+function updateTutorialStep() {
+    const step = tutorialSteps[tutorialStep];
+    tutorialTitle.textContent = step.title;
+    tutorialText.textContent = step.text;
+
+    // Alle vorherigen z-index-Werte zurücksetzen
+    tutorialSteps.forEach((prevStep, index) => {
+        if (prevStep.highlight && index !== tutorialStep) {
+            const prevElement = document.getElementById(prevStep.highlight);
+            if (prevElement) {
+                prevElement.style.zIndex = 'auto';
+            }
+        }
+    });
+
+    if (tutorialStep == 4) {
+        settings();
+    }
+
+    // Tutorial-Overlay zurücksetzen (falls von Step 2)
+    if (tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4) {
+        tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
+        tutorialOverlay.style.zIndex = '999999';
+        const tutorialContent = document.getElementById('tutorial-content');
+        if (tutorialContent) {
+            tutorialContent.style.top = '50%';
+            tutorialContent.style.bottom = 'unset';
+            tutorialContent.style.transform = 'translate(-50%, -50%)';
+        }
+    } else if (tutorialStep == 4) {
+        tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
+        tutorialOverlay.style.zIndex = '999999';
+        const tutorialContent = document.getElementById('tutorial-content');
+        if (tutorialContent) {
+            tutorialContent.style.top = 'unset';
+            tutorialContent.style.bottom = '0';
+            tutorialContent.style.transform = 'translate(-50%, 0)';
+        }
+    }
+
+    // Highlight-Element zurücksetzen
+    tutorialHighlight.style.display = 'none';
+    tutorialHighlight.style.width = '0px';
+    tutorialHighlight.style.height = '0px';
+    tutorialHighlight.style.left = '0px';
+    tutorialHighlight.style.bottom = '0px';
+
+    // Element hervorheben, falls vorhanden
+    if (step.highlight) {
+        const element = document.getElementById(step.highlight);
+        if (element) {
+            const rect = element.getBoundingClientRect();
+            if (tutorialStep !== 2 && tutorialStep !== 3) {
+                tutorialHighlight.style.display = 'block';
+                tutorialHighlight.style.position = 'fixed';
+                tutorialHighlight.style.width = element.offsetWidth + 'px';
+                tutorialHighlight.style.height = element.offsetHeight - 5 + 'px';
+                tutorialHighlight.style.left = rect.left + 'px';
+                tutorialHighlight.style.top = rect.top + 'px'; // WICHTIG: `top`, nicht `bottom`
+                element.style.zIndex = '1000000';
+                if (tutorialStep == 4) {
+                    tutorialHighlight.style.background = 'none'
+                }
+            } else {
+                // Bei Step 2: Tutorial-Overlay transparent machen und Element zugänglich halten
+                tutorialHighlight.style.display = 'none';
+                tutorialOverlay.style.background = 'rgba(0,0,0,0.3)'; // Transparenter Overlay
+                tutorialOverlay.style.zIndex = '0';
+                element.style.zIndex = '1000000000000'; // Hoher z-index für Interaktion
+
+                // Tutorial-Content nach unten verschieben
+                const tutorialContent = document.getElementById('tutorial-content');
+                if (tutorialContent) {
+                    tutorialContent.style.top = 'unset';
+                    tutorialContent.style.bottom = '0';
+                    tutorialContent.style.transform = 'translate(-50%, 0)';
+                }
+            }
+        }
+    }
+
+    if (tutorialStep == 1) {
+        document.getElementById(step.highlight).addEventListener('click', function () {
+            stutorialNext()
+            document.getElementById(step.highlight).style.zIndex = 'unset'
+            tutorialcontent.style.top = 'unset';
+            tutorialcontent.style.bottom = '0';
+        })
+    }
+    if (tutorialStep == 2) {
+
+    }
+
+    // Button-Status aktualisieren
+    tutorialPrev.style.display = tutorialStep === 0 ? 'none' : 'block';
+    tutorialNext.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Fertig' : 'Weiter';
+}
+
+function stutorialNext() {
+    if (tutorialStep < tutorialSteps.length - 1) {
+        tutorialStep++;
+        updateTutorialStep();
+    } else {
+        tutorialSkip();
+    }
+}
+
+function stutorialPrev() {
+    if (tutorialStep > 0) {
+        tutorialStep--;
+        updateTutorialStep();
+    }
+}
+
+function stutorialSkip() {
+    // Alle z-index-Werte zurücksetzen
+    tutorialSteps.forEach((step) => {
+        if (step.highlight) {
+            const element = document.getElementById(step.highlight);
+            if (element) {
+                element.style.zIndex = 'auto';
+            }
+        }
+    });
+
+    // Tutorial-Overlay zurücksetzen
+    tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
+    tutorialcontent.style.display = 'none';
+    tutorialOverlay.style.display = 'none';
+    tutorialHighlight.style.display = 'none';
+    localStorage.setItem('tutorial-completed', 'true');
+}
+
+// Tutorial bei Bedarf neu starten
+function resetTutorial() {
+    localStorage.removeItem('tutorial-completed');
+    startTutorial();
+}
 
 function settings() {
     if (settingsframe.style.display == 'none') {
@@ -150,7 +366,7 @@ function changebg(color) {
         buttons.forEach((button) => {
             const element = document.getElementById(button.id);
             if (!element) return;
-    
+
             if (button.id.startsWith(selectedColor)) {
                 element.classList.add('selected');
                 element.classList.remove('notselected');
@@ -160,7 +376,7 @@ function changebg(color) {
             }
         });
     }
-    
+
 
     // Hilfsfunktion für das Black-Overlay und das Laden des Iframes
     function handleSpecialBg(bgName, scale, src) {
@@ -245,7 +461,6 @@ function start() {
     setTimeout(() => {
         // Warten bis die Nutzer aus Supabase geladen sind
         if (users.length === 0) {
-            console.log('Warte auf Supabase-Nutzer...');
             setTimeout(() => start(), 500);
             return;
         }
@@ -342,6 +557,14 @@ function start() {
             changebg(founduser.bgcolor)
 
             document.getElementsByClassName('settings')[0].style.display = 'block';
+
+            // Tutorial starten, falls noch nicht abgeschlossen
+            setTimeout(() => {
+                if (!localStorage.getItem('tutorial-completed')) {
+                    startTutorial();
+                }
+            }, 1000);
+
             return;
         }
 
@@ -677,6 +900,14 @@ loginform2.onsubmit = function (event) {
                     if (founduser && founduser.displayname) {
                         usname.innerText = founduser.displayname;
                     }
+
+                    // Tutorial starten, falls noch nicht abgeschlossen
+                    setTimeout(() => {
+                        if (!localStorage.getItem('tutorial-completed')) {
+                            startTutorial();
+                        }
+                    }, 1000);
+
                     setTimeout(() => {
                         window.location.reload()
                     }, 2000);
