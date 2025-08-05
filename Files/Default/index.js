@@ -207,7 +207,7 @@ function stutorialNext() {
         tutorialStep++;
         updateTutorialStep();
     } else {
-        tutorialSkip();
+        stutorialSkip();
     }
 }
 
