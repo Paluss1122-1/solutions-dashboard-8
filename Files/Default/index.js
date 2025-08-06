@@ -186,15 +186,15 @@ function updateTutorialStep() {
     }
 
     if (tutorialStep == 1) {
+        tutorialNext.style.display = 'none';
         document.getElementById(step.highlight).addEventListener('click', function () {
             stutorialNext()
             document.getElementById(step.highlight).style.zIndex = 'unset'
             tutorialcontent.style.top = 'unset';
             tutorialcontent.style.bottom = '0';
         })
-    }
-    if (tutorialStep == 2) {
-
+    } else {
+        tutorialNext.style.display = 'block';
     }
 
     // Button-Status aktualisieren
@@ -229,11 +229,15 @@ function stutorialSkip() {
         }
     });
 
+    tutorialcontent.style.opacity = '0';
+    tutorialOverlay.style.opacity = '0';
+    tutorialHighlight.style.opacity = '0';
     // Tutorial-Overlay zurücksetzen
-    tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
-    tutorialcontent.style.display = 'none';
-    tutorialOverlay.style.display = 'none';
-    tutorialHighlight.style.display = 'none';
+    setTimeout(() => {
+        tutorialcontent.style.display = 'none';
+        tutorialOverlay.style.display = 'none';
+        tutorialHighlight.style.display = 'none';
+    }, 1000);
     localStorage.setItem('tutorial-completed', 'true');
 }
 
@@ -474,6 +478,17 @@ function start() {
             });
         }
 
+        if (localStorage.getItem('password') && !localStorage.getItem('username')) {
+            if (!localStorage.getItem('errorhappened')) {
+                alert('Es ist etwas Seltsames passiert! Bitte aktualisieren! Bitte kontaktiere mich, wenn dies öfters passiert!')
+                localStorage.setItem('errorhappened', true)
+                throw new Error('Annything strange Happened! Please refresh!')
+            } else {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
         window.founduser = founduser
         //Admin Funktionen
         if (founduser && founduser.username && founduser.username == 'Paluss1122') {
@@ -498,7 +513,7 @@ function start() {
             linkcontainer.appendChild(newlink3);
         }
 
-        if (localStorage.getItem('allowedcookies') && !founduser.allowedcookies) {
+        if (localStorage.getItem('allowedcookies') && founduser && !founduser.allowedcookies) {
             window.nutzerdatenAendern(founduser.username, { 'allowedcookies': localStorage.getItem('allowedcookies') })
         }
 
