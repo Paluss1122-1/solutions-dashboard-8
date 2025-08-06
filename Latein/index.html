@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="icon.png" type="image/x-icon">
+    <title>Latein Vokabeln</title>
+    <style>
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #8e8701, #ff7002);
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+            position: relative;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            aspect-ratio: 3 / 4;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .buttons button {
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            transform-origin: center;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .buttons button:hover {
+            transform: scale(1.4);
+        }
+
+        .buttons button:disabled {
+            background-color: rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+        }
+
+        button img {
+            width: 24px;
+            border: none;
+            height: 24px;
+        }
+
+        #pageNumber {
+            margin-top: 20px;
+        }
+
+        .normal {
+            font-size: 17px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            text-align: center;
+            border-radius: 10px;
+            border: none;
+            background-color: #ffffff;
+            color: black;
+            padding: 5px;
+        }
+
+        .switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            width: 350px;
+            left: 50%;
+            transform: translate(-50%);
+            background-color: rgb(112, 112, 112);
+            border-radius: 50px;
+            height: 50px;
+        }
+
+        .switcher button {
+            position: relative;
+            flex: 1;
+            color: white;
+            text-align: center;
+            margin: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .switcher button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #workbookImage {
+            border-radius: 30px;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .jump {
+            border-radius: 20px;
+            border: none;
+            background-color: #4d4d4d;
+            color: white;
+            padding: 20px 70px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .jump:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script>
+        const totalPages = 18;
+        let currentPage = 1;
+        const preloadedImages = [];
+        let imageElement, pageNumberElement, prevButton, nextButton;
+
+        function preloadImages() {
+            const preloadRange = 4;
+            for (let i = 0; i < preloadedImages.length; i++) {
+                if (i < currentPage - preloadRange || i > currentPage + preloadRange) {
+                    preloadedImages[i] = undefined;
+                }
+            }
+            for (let i = -preloadRange; i <= preloadRange; i++) {
+                const pageToPreload = currentPage + i;
+                if (pageToPreload > 0 && pageToPreload <= totalPages && !preloadedImages[pageToPreload]) {
+                    const img = new Image();
+                    img.src = `pictures/${pageToPreload}.png`;
+                    preloadedImages[pageToPreload] = img;
+                }
+            }
+        }
+
+        function updatePage() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            const preloadedImage = preloadedImages[currentPage];
+
+            if (preloadedImage) {
+                const tempImage = new Image();
+                tempImage.src = preloadedImage.src;
+
+                tempImage.onload = () => {
+                    imageElement.src = tempImage.src;
+                    imageElement.alt = `Workbook Seite ${currentPage}`;
+                    pageNumberElement.textContent = `Seite ${currentPage} von ${totalPages}`;
+
+                    prevButton.disabled = currentPage === 1;
+                    nextButton.disabled = currentPage === totalPages;
+
+                    loadingOverlay.style.display = 'none';
+                };
+                tempImage.onerror = () => {
+                    loadingOverlay.style.display = 'none';
+                    imageElement.alt = "Bild konnte nicht geladen werden.";
+                };
+            } else {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function initializeElements() {
+            imageElement = document.getElementById('workbookImage');
+            pageNumberElement = document.getElementById('pageNumber');
+            prevButton = document.getElementById('prevButton');
+            nextButton = document.getElementById('nextButton');
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            preloadImages();
+            updatePage();
+        }
+
+        window.onload = () => {
+            initializeElements();
+            preloadImages();
+            updatePage();
+        };
+    </script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const supabaseUrl = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        async function goToActualPage() {
+            try {
+                const { data, error } = await supabase
+                    .from('general') // Wähle die Tabelle "general" aus
+                    .select('Latein') // Hole die Spalte "Latein"
+                    .single(); // Es gibt nur eine Zeile, daher direkt .single()
+
+                if (error) {
+                    console.error("Supabase Fehler:", error);
+                    alert("Fehler beim Laden der Daten!");
+                    return;
+                }
+
+                if (data && data.Latein) {
+                    const pageNumber = parseInt(data.Latein);
+                    if (!isNaN(pageNumber) && pageNumber > 0 && pageNumber <= totalPages) {
+                        currentPage = pageNumber;
+                        if (!imageElement || !pageNumberElement || !prevButton || !nextButton) {
+                            initializeElements();
+                        }
+                        preloadImages();
+                        updatePage();
+                    } else {
+                        alert("Ungültige Seitennummer in der Datenbank!");
+                    }
+                } else {
+                    alert("Keine Daten gefunden!");
+                }
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Seite:", error);
+                alert("Fehler beim Laden der Seite!");
+            }
+        }
+
+        window.goToActualPage = goToActualPage;
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const jumpButton = document.querySelector('.jump');
+            if (jumpButton) {
+                jumpButton.addEventListener('click', goToActualPage);
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <button onclick="window.location = 'https://solutions-dashboard-8.netlify.app'"
+        style="position: fixed; width: 20%; left: 1%; top: 1%; height: auto; background: none; border: none; cursor: pointer; box-shadow: none;">
+        <img src="arrow-left.png" alt="Zurück" style="width: 100%; height: auto; border: none; aspect-ratio: 1; box-shadow: none;">
+    </button>
+
+    <div id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container" id="container">
+        <h1>Latein Vokabeln</h1>
+        <button class="jump">Springe zu ca. aktuellem Wortschatz</button>
+        <img id="workbookImage" src="pictures/1.png" alt="Workbook Seite 1">
+        <div class="buttons">
+            <button id="prevButton" onclick="changePage(-1)" disabled>
+                <img src="arrow-left.png" alt="Zurück">
+            </button>
+            <button id="nextButton" onclick="changePage(1)">
+                <img src="arrow-right.png" alt="Weiter">
+            </button>
+        </div>
+        <p id="pageNumber">Seite 1 von 18</p>
+    </div>
+</body>
+
+</html>
