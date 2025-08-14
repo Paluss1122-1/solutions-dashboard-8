@@ -40,7 +40,31 @@ function warteAufBubbleButton(versuche = 0) {
         }, 500);
     }
 }
-warteAufBubbleButton();
+function warteAufBubbleMessage(versuche = 0) {
+    // Deutsche Version mit Fix: Die Wiederholungen werden jetzt nur einmal gesetzt, und beide Elemente werden unabhängig geprüft.
+    const closeBtn = Array.from(document.querySelectorAll('div')).find(el => el.textContent.trim() === '✕' && el.style.position === 'absolute');
+    const msgbubble = document.querySelector('div[style*="display: flex"][style*="justify-content: flex-end"]');
+
+    if (closeBtn) {
+        closeBtn.onclick = function () {
+            SendAnalyticsStep('Chatbase Pop Message geschlossen');
+        }
+    } else if (versuche < 20) {
+        setTimeout(() => {
+            warteAufBubbleMessage(versuche + 1);
+        }, 500);
+    }
+
+    if (msgbubble) {
+        msgbubble.addEventListener('click', function () {
+            SendAnalyticsStep('Auf Chatbase Pop Message gedrückt');
+        });
+    }
+}
+setTimeout(() => {
+    warteAufBubbleMessage();
+    warteAufBubbleButton();
+}, 1000);
 
 // Tutorial Variablen
 const tutorialOverlay = document.getElementById('tutorial-overlay');
