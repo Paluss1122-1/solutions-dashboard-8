@@ -5,6 +5,6 @@ Allow: /
 Disallow: /Admin/
 
 # Bitte ersetze die Domain unten mit deiner Produktions-URL
-Sitemap: https://REPLACE_WITH_YOUR_DOMAIN/sitemap.xml
+Sitemap: https://solutions-dashboard-8.netlify.app/sitemap.xml
 
 
