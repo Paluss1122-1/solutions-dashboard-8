@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Admin-Bereich für alle Crawler sperren
+Disallow: /Admin/
+
+# Bitte ersetze die Domain unten mit deiner Produktions-URL
+Sitemap: https://REPLACE_WITH_YOUR_DOMAIN/sitemap.xml
+
+
