@@ -462,3 +462,13 @@ body {
 #setdisplayname input:focus {
     outline: none;
 }
+
+#problem {
+    position: fixed;
+    left: 50%;
+    color: red;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: none;
+}

@@ -13,7 +13,7 @@ async function ladeUsers() {
         console.error('Supabase-Client ist nicht verfügbar');
         return;
     }
-    
+
     try {
         const { data, error } = await supabase
             .from('users')
@@ -21,7 +21,45 @@ async function ladeUsers() {
 
         if (error) {
             console.error('Fehler beim Laden der Nutzer:', error.message);
-            return;
+            const problem = document.getElementById('problem')
+            problem.style.display = 'block';
+            fetch("https://jsonplaceholder.typicode.com/posts")
+                .then(response => {
+                    if (!response.ok) {
+                        problem.innerText = "Server konnte nicht erreicht werden.";
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    problem.innerText =
+                        "An deinem Internet liegt es nicht... Es wird nach weiteren möglichen Ursachen für das Problem gesucht.";
+                    const ls = localStorage
+                    if (!ls.getItem('username')) {
+                        problem.innerText = "Du bist Abgemeldet!"
+                        localStorage.clear();
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 1000);
+                    } else if(!ls.getItem('password')) {
+                        problem.innerText = "Du bist Abgemeldet!"
+                        localStorage.clear();
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 1000);
+                    } else if (users = []) {
+                        problem.innerText = 'Es gibt aktuell Problem mit den Servern!'
+                    }
+                })
+                .catch(error => {
+                    if (
+                        error.message.includes("Failed to fetch") ||
+                        error.message.includes("NetworkError") ||
+                        error.message.includes("Load failed")
+                    ) {
+                        problem.innerText =
+                            "Du hast keine Internetverbindung! Stelle eine Verbindung her und lade die Website neu!";
+                    }
+                });
         }
 
         users = data || [];
