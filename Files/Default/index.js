@@ -486,7 +486,7 @@ function start() {
     setTimeout(() => {
         intro.remove()
     }, 1000);
-    if (window.released == false) return;
+    if (window.released == false && !founduser.username == 'Paluss1122') return;
     setTimeout(() => {
         // Warten bis die Nutzer aus Supabase geladen sind
         if (users.length === 0) {
