@@ -230,7 +230,7 @@ async function update() {
         // Falls Released == false -> Countdown anzeigen
         if (data.released === false) {
             const countdown = document.getElementById('countdown');
-            countdown.style.zIndex = '1000000000000';
+            countdown.style.zIndex = '10000';
             countdown.style.display = 'flex';
 
             document.getElementById('bg-iframe').setAttribute('src', '/');

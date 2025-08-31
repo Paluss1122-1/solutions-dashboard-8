@@ -257,7 +257,7 @@ body {
     align-items: center;
     flex-direction: column;
     background-color: black;
-    z-index: 10000000000000000000;
+    z-index: 100000;
 }
 
 .link-container {
