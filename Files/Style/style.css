@@ -199,7 +199,8 @@ body {
     top: 0;
 }
 
-.intro-title {
+.intro-title,
+.countdown-title {
     margin: 0;
     font-size: 4.5em;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -215,7 +216,24 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-.intro-credits {
+.countdown-change {
+    animation: blurFade 1s ease;
+}
+
+@keyframes blurFade {
+    0% {
+        filter: blur(10px);
+        opacity: 0.8;
+    }
+
+    100% {
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+.intro-credits,
+.countdown-credits {
     margin: 0;
     font-size: 2em;
     opacity: 0;
@@ -228,7 +246,9 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-#intro {
+#intro,
+#countdown {
+    top: 0;
     position: fixed;
     width: 100%;
     height: 100%;

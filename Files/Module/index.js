@@ -179,16 +179,14 @@ async function update() {
 
         window.generalData = data;
 
-
         let showMaintenance = false;
         const active = data && data.Wartungsarbeiten;
 
         if (founduser) {
             try {
-                // Nur Paluss1122 sieht KEINE Wartungsarbeiten, alle anderen schon
                 if (founduser.username === "Paluss1122" && active) {
                     showMaintenance = false;
-                    document.title = 'Dashboard'
+                    document.title = 'Dashboard';
                 } else {
                     document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                     showMaintenance = active;
@@ -201,7 +199,7 @@ async function update() {
         } else if (localStorage.getItem('username')) {
             if (localStorage.getItem('username') === "Paluss1122" && active) {
                 showMaintenance = false;
-                document.title = 'Dashboard'
+                document.title = 'Dashboard';
             } else {
                 document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                 showMaintenance = active;
@@ -213,23 +211,74 @@ async function update() {
 
         const maintenanceFrame = document.getElementById("maintenance-frame");
         if (maintenanceFrame) {
-            if (showMaintenance == true) {
+            if (showMaintenance === true) {
                 maintenanceFrame.style.display = 'flex';
-                maintenanceFrame.style.opacity = '1'
+                maintenanceFrame.style.opacity = '1';
             } else {
-                maintenanceFrame.style.opacity = '1'
+                maintenanceFrame.style.opacity = '1';
                 setTimeout(() => {
                     maintenanceFrame.style.display = 'none';
                 }, 1000);
             }
         }
+
         document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
         document.getElementById("why-ws").innerText = data.Grund;
+
+        // Falls Released == false -> Countdown anzeigen
+        if (data.released === false) {
+            const countdown = document.getElementById('countdown');
+            countdown.style.zIndex = '1000000000000';
+            countdown.style.display = 'flex';
+
+            // Zielzeit für Countdown global setzen
+            if (data.releasedate) {
+                window.releaseTimestamp = new Date(data.releasedate).getTime();
+            }
+        }
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
     }
 }
 
-setInterval(() => {
-    update()
-}, 2000);
+// Update alle 2 Sekunden für generelle Daten
+setInterval(update, 2000);
+
+function startCountdown() {
+    let lastValue = "";
+
+    setInterval(() => {
+        if (!window.releaseTimestamp) return;
+
+        const cd = document.getElementById("cd");
+        const now = new Date().getTime();
+        const distance = window.releaseTimestamp - now;
+
+        if (cd.style.opacity === "0") {
+            cd.style.opacity = "1"; 
+        }
+
+        let text;
+        if (distance <= 0) {
+            text = "Bereit!";
+        } else {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            text = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Effekt nur bei Änderung triggern
+        if (text !== lastValue) {
+            cd.innerText = text;
+            cd.classList.remove("countdown-change");
+            void cd.offsetWidth; // reflow force für restart
+            cd.classList.add("countdown-change");
+            lastValue = text;
+        }
+    }, 1000);
+}
+
+startCountdown();
