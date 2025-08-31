@@ -45,6 +45,8 @@ function warteAufBubbleMessage(versuche = 0) {
     const closeBtn = Array.from(document.querySelectorAll('div')).find(el => el.textContent.trim() === '✕' && el.style.position === 'absolute');
     const msgbubble = document.querySelector('div[style*="display: flex"][style*="justify-content: flex-end"]');
 
+    msgbubble.style.zIndex = '0';
+    msgbubble.style.position = 'relative';
     if (closeBtn) {
         closeBtn.onclick = function () {
             SendAnalyticsStep('Chatbase Pop Message geschlossen');
@@ -389,7 +391,6 @@ function changebg(color) {
         { id: 'slidebg1', gradient: 'linear-gradient(-45deg, green, red)' },
     ];
 
-    // Hilfsfunktion für das Umschalten der Button-Auswahl
     function updateButtonSelection(selectedColor) {
         buttons.forEach((button) => {
             const element = document.getElementById(button.id);
@@ -405,9 +406,7 @@ function changebg(color) {
         });
     }
 
-
-    // Hilfsfunktion für das Black-Overlay und das Laden des Iframes
-    function handleSpecialBg(bgName, scale, src) {
+    function handleSpecialBg(bgName, scale, src, isVideo = true) {
         black.style.display = 'block';
         black.style.opacity = '0';
         black.style.transition = 'opacity 1s';
@@ -415,8 +414,10 @@ function changebg(color) {
         void black.offsetWidth;
         black.style.opacity = '1';
         updateButtonSelection(bgName + 'bg');
-        bgiframe.addEventListener('load', function handler() {
-            bgiframe.removeEventListener('load', handler);
+
+        // Event für Video laden
+        function onLoaded() {
+            bgiframe.removeEventListener('loadeddata', onLoaded);
             setTimeout(() => {
                 bgiframe.style.display = 'block';
                 bgiframe.style.transition = 'opacity 1s, filter 2s';
@@ -429,23 +430,26 @@ function changebg(color) {
                     black.removeEventListener('transitionend', handler2);
                 });
             }, 500);
-        });
+        }
+        bgiframe.addEventListener('loadeddata', onLoaded);
+
         setTimeout(() => {
-            bgiframe.setAttribute('src', src);
+            bgiframe.src = src;
+            bgiframe.load && bgiframe.load();
         }, 1000);
     }
 
     if (color === 'spinning') {
-        handleSpecialBg('spinning', 'scale(5)', 'LoadingScreen/Spinning Circle/index.html');
+        handleSpecialBg('spinning', 'scale(2)', 'LoadingScreen/Spinning circle/video.mp4');
         return;
     } else if (color === 'wave') {
-        handleSpecialBg('wave', 'scale(1)', 'LoadingScreen/Wave/index.html');
+        handleSpecialBg('wave', 'scale(1)', 'LoadingScreen/Wave/video.mp4');
         return;
     } else if (color === 'rain') {
-        handleSpecialBg('rain', 'scale(1)', 'LoadingScreen/Rain/index.html');
+        handleSpecialBg('rain', 'scale(1)', 'LoadingScreen/Rain/video.mp4');
         return;
     } else if (color === 'slide') {
-        handleSpecialBg('slide', 'scale(1)', 'LoadingScreen/Sliding Diagonals/index.html');
+        handleSpecialBg('slide', 'scale(1)', 'LoadingScreen/Sliding Diagonals/video.mp4');
         return;
     }
 
@@ -453,10 +457,10 @@ function changebg(color) {
     const selectedButton = buttons.find((button) => button.id.includes(color));
 
     if (selectedButton) {
-        // Korrigierte Bedingung: Nur wenn NICHT einer der Spezialtypen, dann iframe ausblenden
+        // Nur wenn NICHT einer der Spezialtypen, dann Video ausblenden
         if (!['spinning', 'wave', 'rain', 'slide'].includes(color)) {
             bgiframe.style.opacity = '0';
-            bgiframe.setAttribute('src', ' ');
+            bgiframe.src = '';
         }
         black.style.display = 'block';
         black.style.opacity = '0';
@@ -600,10 +604,16 @@ function start() {
 
             // Tutorial starten, falls noch nicht abgeschlossen
             setTimeout(() => {
-                if (!localStorage.getItem('tutorial-completed')) {
+                if (!localStorage.getItem('tutorial-completed') && window.released == true) {
                     startTutorial();
                 }
             }, 1000);
+
+            if (window.released == false) {
+                document.getElementById('bg-iframe').setAttribute('src', '/');
+            }
+
+            document.getElementById('countdown').style.display = 'flex';
 
             return;
         }
@@ -942,11 +952,12 @@ loginform2.onsubmit = function (event) {
                     }
 
                     // Tutorial starten, falls noch nicht abgeschlossen
-                    setTimeout(() => {
-                        if (!localStorage.getItem('tutorial-completed')) {
-                            startTutorial();
-                        }
-                    }, 1000);
+
+                    if (window.released == false) {
+                        document.getElementById('bg-iframe').setAttribute('src', '/');
+                    }
+
+                    document.getElementById('countdown').style.display = 'flex';
 
                     setTimeout(() => {
                         window.location.reload()
@@ -1131,6 +1142,7 @@ loginform5.onsubmit = function (event) {
                 startp.style.display = 'none';
             }, 1000);
             localStorage.setItem('showeddb', true)
+            window.location.reload()
 
             // usname aus founduser.displayname setzen
             if (founduser && founduser.displayname) {

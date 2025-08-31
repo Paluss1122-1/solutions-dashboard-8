@@ -235,9 +235,6 @@ async function update() {
         if (data.released === false) {
             const countdown = document.getElementById('countdown');
             countdown.style.zIndex = '10000';
-            countdown.style.display = 'flex';
-
-            document.getElementById('bg-iframe').setAttribute('src', '/');
 
             // Zielzeit für Countdown global setzen
             if (data.releasedate) {
