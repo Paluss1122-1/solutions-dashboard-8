@@ -260,10 +260,10 @@ if (released == null) {
     setInterval(update, 2000);
 }
 
-function startCountdown() {
+async function startCountdown() {
     let lastValue = "";
 
-    setInterval(() => {
+    const interval = setInterval(async () => {
         if (!window.releaseTimestamp) return;
 
         const cd = document.getElementById("cd");
@@ -277,6 +277,26 @@ function startCountdown() {
         let text;
         if (distance <= 0) {
             text = "Bereit!";
+            try {
+                // Erste Zeile updaten → released = true
+                const { data, error } = await supabase
+                    .from("general")
+                    .update({ released: true })
+                    .order("id", { ascending: true })
+                    .limit(1);
+
+                if (error) {
+                    console.error("Fehler beim Aktualisieren:", error.message);
+                    return false;
+                }
+
+                // Timer stoppen, damit nicht jede Sekunde erneut geschrieben wird
+                clearInterval(interval);
+                return true;
+            } catch (err) {
+                console.error("Unerwarteter Fehler:", err);
+                return false;
+            }
         } else {
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
