@@ -178,58 +178,62 @@ async function update() {
         }
 
         window.generalData = data;
-
-        let showMaintenance = false;
-        const active = data && data.Wartungsarbeiten;
-
-        if (founduser) {
-            try {
-                if (founduser.username === "Paluss1122" && active) {
+        window.released = data.released;
+        if (!data.released === false) {
+            let showMaintenance = false;
+            const active = data && data.Wartungsarbeiten;
+    
+            if (founduser) {
+                try {
+                    if (founduser.username === "Paluss1122" && active) {
+                        showMaintenance = false;
+                        document.title = 'Dashboard';
+                    } else {
+                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                        showMaintenance = active;
+                    }
+                } catch (e) {
+                    document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                    console.error("Fehler beim Parsen des Benutzers:", e);
+                    showMaintenance = active;
+                }
+            } else if (localStorage.getItem('username')) {
+                if (localStorage.getItem('username') === "Paluss1122" && active) {
                     showMaintenance = false;
                     document.title = 'Dashboard';
                 } else {
                     document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                     showMaintenance = active;
                 }
-            } catch (e) {
-                document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                console.error("Fehler beim Parsen des Benutzers:", e);
-                showMaintenance = active;
-            }
-        } else if (localStorage.getItem('username')) {
-            if (localStorage.getItem('username') === "Paluss1122" && active) {
-                showMaintenance = false;
-                document.title = 'Dashboard';
             } else {
                 document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                 showMaintenance = active;
             }
-        } else {
-            document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-            showMaintenance = active;
-        }
-
-        const maintenanceFrame = document.getElementById("maintenance-frame");
-        if (maintenanceFrame) {
-            if (showMaintenance === true) {
-                maintenanceFrame.style.display = 'flex';
-                maintenanceFrame.style.opacity = '1';
-            } else {
-                maintenanceFrame.style.opacity = '1';
-                setTimeout(() => {
-                    maintenanceFrame.style.display = 'none';
-                }, 1000);
+    
+            const maintenanceFrame = document.getElementById("maintenance-frame");
+            if (maintenanceFrame) {
+                if (showMaintenance === true) {
+                    maintenanceFrame.style.display = 'flex';
+                    maintenanceFrame.style.opacity = '1';
+                } else {
+                    maintenanceFrame.style.opacity = '1';
+                    setTimeout(() => {
+                        maintenanceFrame.style.display = 'none';
+                    }, 1000);
+                }
             }
+    
+            document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
+            document.getElementById("why-ws").innerText = data.Grund;
         }
-
-        document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
-        document.getElementById("why-ws").innerText = data.Grund;
-
+        
         // Falls Released == false -> Countdown anzeigen
         if (data.released === false) {
             const countdown = document.getElementById('countdown');
             countdown.style.zIndex = '1000000000000';
             countdown.style.display = 'flex';
+
+            document.getElementById('bg-iframe').setAttribute('src', '/');
 
             // Zielzeit für Countdown global setzen
             if (data.releasedate) {
@@ -241,8 +245,16 @@ async function update() {
     }
 }
 
+let released
+
 // Update alle 2 Sekunden für generelle Daten
-setInterval(update, 2000);
+if (released == null){
+    update();
+} else if (released == false) {
+    setInterval(update, 60000);
+} else if (released == true) {
+    setInterval(update, 2000);
+}
 
 function startCountdown() {
     let lastValue = "";
