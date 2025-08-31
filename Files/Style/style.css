@@ -492,3 +492,14 @@ body {
     text-align: center;
     display: none;
 }
+
+
+@media screen and (max-width: 600px) {
+    .countdown-title {
+        font-size: 2em;
+    }
+
+    .countdown-credits {
+        font-size: 1em;
+    }
+}

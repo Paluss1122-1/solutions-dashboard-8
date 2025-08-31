@@ -40,7 +40,7 @@ async function ladeUsers() {
                         setTimeout(() => {
                             window.location.reload()
                         }, 1000);
-                    } else if(!ls.getItem('password')) {
+                    } else if (!ls.getItem('password')) {
                         problem.innerText = "Du bist Abgemeldet!"
                         localStorage.clear();
                         setTimeout(() => {
@@ -129,11 +129,13 @@ function getBrowserName() {
 
 window.SendAnalyticsStep = async function (action) {
     let user = null;
-    try {
-        user = window.founduser.username;
-    } catch (e) {
-        console.error("Fehler beim Auslesen des Benutzernamens:", e);
-        user = null;
+    if (founduser) {
+        try {
+            user = window.founduser.username;
+        } catch (e) {
+            console.error("Fehler beim Auslesen des Benutzernamens:", e);
+            user = null;
+        }
     }
 
     // Prüfe, ob die Seite nicht lokal läuft
@@ -165,6 +167,8 @@ window.SendAnalyticsStep = async function (action) {
     }
 }
 
+window.SendAnalyticsStep('Website besucht!')
+
 async function update() {
     try {
         const { data, error } = await supabase
@@ -182,7 +186,7 @@ async function update() {
         if (!data.released === false) {
             let showMaintenance = false;
             const active = data && data.Wartungsarbeiten;
-    
+
             if (founduser) {
                 try {
                     if (founduser.username === "Paluss1122" && active) {
@@ -209,7 +213,7 @@ async function update() {
                 document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                 showMaintenance = active;
             }
-    
+
             const maintenanceFrame = document.getElementById("maintenance-frame");
             if (maintenanceFrame) {
                 if (showMaintenance === true) {
@@ -222,11 +226,11 @@ async function update() {
                     }, 1000);
                 }
             }
-    
+
             document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
             document.getElementById("why-ws").innerText = data.Grund;
         }
-        
+
         // Falls Released == false -> Countdown anzeigen
         if (data.released === false) {
             const countdown = document.getElementById('countdown');
@@ -248,7 +252,7 @@ async function update() {
 let released
 
 // Update alle 2 Sekunden für generelle Daten
-if (released == null){
+if (released == null) {
     update();
 } else if (released == false) {
     setInterval(update, 60000);
@@ -267,7 +271,7 @@ function startCountdown() {
         const distance = window.releaseTimestamp - now;
 
         if (cd.style.opacity === "0") {
-            cd.style.opacity = "1"; 
+            cd.style.opacity = "1";
         }
 
         let text;
