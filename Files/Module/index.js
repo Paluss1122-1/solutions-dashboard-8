@@ -269,7 +269,7 @@ function startCountdown() {
         const cd = document.getElementById("cd");
         const now = new Date().getTime();
         const distance = window.releaseTimestamp - now;
-
+        if (!cd) return;
         if (cd.style.opacity === "0") {
             cd.style.opacity = "1";
         }
