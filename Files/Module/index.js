@@ -131,7 +131,7 @@ window.SendAnalyticsStep = async function (action) {
     let user = null;
     if (founduser) {
         try {
-            user = window.founduser.username;
+            user = localStorage.getItem('username');
         } catch (e) {
             console.error("Fehler beim Auslesen des Benutzernamens:", e);
             user = null;
