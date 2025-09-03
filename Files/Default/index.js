@@ -341,33 +341,33 @@ function getTageszeit() {
         const zufall = morgen[Math.floor(Math.random() * morgen.length)];
         text = zufall.text;
         if (f) f.innerText = zufall.f ? '?' : '';
-        SendAnalyticsStep('Guten Morgen Nachricht angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Guten Morgen Nachricht angezeigt: ' + text);
     } else if (stunde >= 11 && stunde < 14) {
         const zufall = mittag[Math.floor(Math.random() * morgen.length)];
         text = zufall.text;
-        SendAnalyticsStep('Guten Mittag Nachricht angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Guten Mittag Nachricht angezeigt: ' + text);
         if (f) f.innerText = zufall.f ? '?' : '';
     } else if (stunde >= 14 && stunde < 17) {
         const zufall = nachmittag[Math.floor(Math.random() * morgen.length)];
         text = zufall.text;
-        SendAnalyticsStep('Guten Nachmittag Nachricht angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Guten Nachmittag Nachricht angezeigt: ' + text);
         if (f) f.innerText = zufall.f ? '?' : '';
     } else if (stunde >= 17 && stunde < 22) {
         const zufall = abend[Math.floor(Math.random() * morgen.length)];
         text = zufall.text;
         if (f) f.innerText = zufall.f ? '?' : '';
-        SendAnalyticsStep('Guten Abend Nachricht angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Guten Abend Nachricht angezeigt: ' + text);
     } else {
         const zufall = nacht[Math.floor(Math.random() * morgen.length)];
         text = zufall.text;
         if (f) f.innerText = zufall.f ? '?' : '';
-        SendAnalyticsStep('Gute Nacht Nachricht angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Gute Nacht Nachricht angezeigt: ' + text);
     }
 
     if (founduser.username == 'Nina13') {
         text = 'Hiiii meine kleine 😘'
         if (f) f.innerText = '';
-        SendAnalyticsStep('Spezial Nachricht für Nini Mausi angezeigt: ' + text + ' - ' + founduser.username);
+        SendAnalyticsStep('Spezial Nachricht für Nini Mausi angezeigt: ' + text);
     }
     if (begruessung) begruessung.innerText = text;
 }
@@ -503,7 +503,7 @@ function changebg(color) {
             });
         }, 300);
         localStorage.setItem('bg-color', color);
-        SendAnalyticsStep(founduser.username + ' hat Hintergrund geändert zu: ' + color);
+        SendAnalyticsStep('Hintergrund geändert zu: ' + color);
     }
 }
 
@@ -532,12 +532,12 @@ function start() {
 
         if (localStorage.getItem('password') && !localStorage.getItem('username')) {
             if (!localStorage.getItem('errorhappened')) {
-                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername!' + founduser.username);
+                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername!');
                 alert('Es ist etwas Seltsames passiert! Bitte Lade die Seite neu!')
                 localStorage.setItem('errorhappened', true)
                 throw new Error('Annything strange Happened! Please refresh!')
             } else {
-                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername, alles wird zurückgesetzt!' + founduser.username);
+                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername, alles wird zurückgesetzt!');
                 localStorage.clear();
                 window.location.reload();
             }
@@ -571,38 +571,38 @@ function start() {
 
         if (localStorage.getItem('allowedcookies') && founduser && !founduser.allowedcookies) {
             window.nutzerdatenAendern(founduser.username, { 'allowedcookies': localStorage.getItem('allowedcookies') })
-            SendAnalyticsStep('allowedcookies aus localStorage in Supabase synchronisiert: ' + founduser.username);
+            SendAnalyticsStep('allowedcookies aus localStorage in Supabase synchronisiert');
         }
 
         // Mobile Anpassung
         if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             if (loginContainer) {
                 loginContainer.style.width = '80%';
-                SendAnalyticsStep('Mobile erkannt, Login Container angepasst' + founduser.username);
+                SendAnalyticsStep('Mobile erkannt, Login Container angepasst');
             }
         }
 
         // bg-color aus Supabase in localStorage synchronisieren
         if (founduser && founduser.bgcolor && !localStorage.getItem('bg-color')) {
             localStorage.setItem('bg-color', founduser.bgcolor);
-            SendAnalyticsStep('bg-color aus Supabase in localStorage synchronisiert: ' + founduser.username);
+            SendAnalyticsStep('bg-color aus Supabase in localStorage synchronisiert');
         }
         // displayname aus Supabase in localStorage synchronisieren
         if (founduser && founduser.displayname && !localStorage.getItem('displayname')) {
             localStorage.setItem('displayname', founduser.displayname);
-            SendAnalyticsStep('displayname aus Supabase in localStorage synchronisiert: ' + founduser.username);
+            SendAnalyticsStep('displayname aus Supabase in localStorage synchronisiert');
         }
 
         // allowedcookies aus Supabase in localStorage synchronisieren
         if (founduser && founduser.allowedcookies && !localStorage.getItem('allowedcookies')) {
             localStorage.setItem('allowedcookies', 'true');
-            SendAnalyticsStep('allowedcookies aus Supabase in localStorage synchronisiert: ' + founduser.username);
+            SendAnalyticsStep('allowedcookies aus Supabase in localStorage synchronisiert');
         }
 
         // bg-color aus localStorage in Supabase synchronisieren (falls nicht vorhanden)
         if (localStorage.getItem('bg-color') && founduser && !founduser.bgcolor) {
             nutzerdatenAendern(founduser.username, { bgcolor: localStorage.getItem('bg-color') });
-            SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert: ' + founduser.username);
+            SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert');
         }
 
         // Vollständig eingeloggt - Dashboard anzeigen
@@ -639,13 +639,13 @@ function start() {
             setTimeout(() => {
                 if (!localStorage.getItem('tutorial-completed') && window.released == true) {
                     startTutorial();
-                    SendAnalyticsStep('Tutorial gestartet' + founduser.username);
+                    SendAnalyticsStep('Tutorial gestartet');
                 }
             }, 1000);
 
             if (window.released == false) {
                 document.getElementById('bg-iframe').setAttribute('src', '/');
-                SendAnalyticsStep('Noch nicht released also scource von bg iframe "/": ' + founduser.username);
+                SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
             }
 
             document.getElementById('countdown').style.display = 'flex';
@@ -1000,7 +1000,7 @@ loginform2.onsubmit = function (event) {
 
                     if (window.released == false) {
                         document.getElementById('bg-iframe').setAttribute('src', '/');
-                        SendAnalyticsStep('Noch nicht released also scource von bg iframe "/": ' + founduser.username);
+                        SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
                     }
 
                     document.getElementById('countdown').style.display = 'flex';
@@ -1012,11 +1012,11 @@ loginform2.onsubmit = function (event) {
             }
         }, 500);
         localStorage.setItem('password', founduser.password)
-        window.SendAnalyticsStep('Passwort korrekt eingegeben für Nutzer: ' + founduser.username);
+        window.SendAnalyticsStep('Passwort korrekt eingegeben');
     } else {
         Hinweis2.style.display = 'block';
         Hinweis2.innerText = 'Passwort nicht korrekt. Überprüfe die Schreibweise!';
-        window.SendAnalyticsStep('Fehlerhaftes Passwort für Nutzer: ' + founduser.username);
+        window.SendAnalyticsStep('Fehlerhaftes Passwort');
     }
 };
 
@@ -1162,7 +1162,7 @@ loginform5.onsubmit = function (event) {
     }
     localStorage.setItem('allowedcookies', true);
     nutzerdatenAendern(founduser.username, { allowedcookies: true })
-    SendAnalyticsStep('Nutzer hat Cookies erlaubt: ' + founduser.username);
+    SendAnalyticsStep('Nutzer hat Cookies erlaubt');
     loginContainer.style.transition = 'opacity 0.5s'
     loginContainer.style.opacity = '0';
     setTimeout(() => {
@@ -1207,5 +1207,5 @@ setdisplayname.onsubmit = function (e) {
     e.preventDefault();
     nutzerdatenAendern(founduser.username, { displayname: setdisplayname.value });
     Hinweis3.innerText = 'Name erfolgreich geändert!';
-    SendAnalyticsStep('Nutzer: ' + founduser.username + ' hat Displayname geändert: ' + setdisplayname.value);
+    SendAnalyticsStep('Nutzer hat Displayname geändert: ' + setdisplayname.value);
 }

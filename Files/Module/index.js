@@ -183,7 +183,9 @@ window.SendAnalyticsStep = async function (action) {
     }
 }
 
-window.SendAnalyticsStep('Website besucht!')
+setTimeout(() => {
+    window.SendAnalyticsStep('Website besucht!')
+}, 3000);
 
 async function update() {
     try {
