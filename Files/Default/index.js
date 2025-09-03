@@ -62,12 +62,12 @@ function warteAufBubbleMessage(versuche = 0) {
     const closeBtn = Array.from(document.querySelectorAll('div')).find(el => el.textContent.trim() === '✕' && el.style.position === 'absolute');
     const msgbubble = document.querySelector('div[style*="display: flex"][style*="justify-content: flex-end"]');
 
-    msgbubble.style.zIndex = '0';
-    msgbubble.style.position = 'relative';
-    if (closeBtn) {
+    if (closeBtn && msgbubble) {
         closeBtn.onclick = function () {
             SendAnalyticsStep('Chatbase Pop Message geschlossen');
         }
+        msgbubble.style.zIndex = '0';
+        msgbubble.style.position = 'relative';
     } else if (versuche < 20) {
         setTimeout(() => {
             warteAufBubbleMessage(versuche + 1);
@@ -275,7 +275,7 @@ function stutorialSkip() {
     tutorialcontent.style.opacity = '0';
     tutorialOverlay.style.opacity = '0';
     tutorialHighlight.style.opacity = '0';
-    
+
     setTimeout(() => {
         tutorialcontent.style.display = 'none';
         tutorialOverlay.style.display = 'none';
