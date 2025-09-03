@@ -211,8 +211,8 @@ body {
     text-align: center;
     background: linear-gradient(150deg, red, blue);
     color: transparent;
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -241,8 +241,8 @@ body {
     text-align: center;
     background: red;
     color: transparent;
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

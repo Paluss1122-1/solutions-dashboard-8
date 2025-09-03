@@ -4,13 +4,43 @@
 <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <title>Dashboard</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.ico">
     <link rel="stylesheet" href="Files/Style/style.css">
     <script>
-        (function () { if (!window.chatbase || window.chatbase("getState") !== "initialized") { window.chatbase = (...arguments) => { if (!window.chatbase.q) { window.chatbase.q = [] } window.chatbase.q.push(arguments) }; window.chatbase = new Proxy(window.chatbase, { get(target, prop) { if (prop === "q") { return target.q } return (...args) => target(prop, ...args) } }) } const onLoad = function () { const script = document.createElement("script"); script.src = "https://www.chatbase.co/embed.min.js"; script.id = "G3lrHnnj6OSR2IaHA1iR8"; script.domain = "www.chatbase.co"; document.body.appendChild(script) }; if (document.readyState === "complete") { onLoad() } else { window.addEventListener("load", onLoad) } })();
+        (function () {
+            if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+                window.chatbase = (...arguments) => {
+                    if (!window.chatbase.q) {
+                        window.chatbase.q = []
+                    }
+                    window.chatbase.q.push(arguments)
+                };
+                window.chatbase = new Proxy(window.chatbase, {
+                    get(target, prop) {
+                        if (prop === "q") {
+                            return target.q
+                        }
+                        return (...args) => target(prop, ...args)
+                    }
+                })
+            }
+            const onLoad = function () {
+                const script = document.createElement("script");
+                script.src = "https://www.chatbase.co/embed.min.js";
+                script.id = "G3lrHnnj6OSR2IaHA1iR8";
+                script.domain = "www.chatbase.co";
+                document.body.appendChild(script)
+            };
+            if (document.readyState === "complete") {
+                onLoad()
+            } else {
+                window.addEventListener("load", onLoad)
+            }
+        })();
     </script>
     <meta name="google-site-verification" content="1aTQskq8WGI2dKHzTrsfXzXzpibQ-splCo6KtK7MkTs" />
 </head>
@@ -26,7 +56,8 @@
         <p class='intro-credits'>Made by Paluss1122</p>
     </div>
     <div id="maintenance-frame"
-        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,1); color:white; z-index:999999; align-items:center; justify-content:center; flex-direction:column; font-size:2em; opacity: 0; transition: opacity 1s;">
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,1); 
+        color:white; z-index:999999; align-items:center; justify-content:center; flex-direction:column; font-size:2em; opacity: 0; transition: opacity 1s;">
         <div style="width: 100%; text-align: center;">
             <h1 style="width: 100%;; font-size:xx-large">⚠️ Wartungsarbeiten</h1>
             <p style="width: 100%;">Aktuell finden Wartungsarbeiten statt!</p>
@@ -79,7 +110,8 @@
         <p id='info-text' style='font-size: 0.5em'>Hiiii</p>
 
         <button
-            onclick='document.getElementById("info-container").style.opacity = "0"; setTimeout(() => {document.getElementById("info-container").style.zIndex = "-10";}, 500);'>
+            onclick='document.getElementById("info-container").style.opacity = "0"; setTimeout(() => {document.getElementById("info-container").style.zIndex = "-10";}, 500);'
+            title="Zurück">
             Zurück
         </button>
     </div>
@@ -91,9 +123,11 @@
 
             <p id='Hinweis-1' style='display: none;'></p>
 
-            <button style='margin: 0;' type='submit'>Weiter zur Passwort Eingabe</button>
+            <button style='margin: 0;' type='submit' title="Weiter zur Passwort Eingabe">Weiter zur Passwort
+                Eingabe</button>
 
-            <button onclick='nousername()' type='button'>Ich kenne meinen Nutzername nicht / <br> Ich hab keinen
+            <button onclick='nousername()' type='button' title="Nutzername vergessen / kenne ihn nicht">Ich kenne meinen
+                Nutzername nicht / <br> Ich hab keinen
                 Nutzername erhalten</button>
         </form>
 
@@ -104,20 +138,25 @@
 
             <p id='Hinweis-2' style='display: none;'></p>
 
-            <button id='eye' type='button' onclick='togglePasswordVisibility()'
-                style='position: absolute; right: 10px; top: 50%; transform: translateY(-70%); background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: none; font-size: 30px;'>
+            <button id='eye' type='button' onclick='togglePasswordVisibility()' style='position: absolute; right: 10px; top: 50%; 
+                transform: translateY(-70%); background: none; border: none; cursor: pointer; 
+                padding: 0; margin: 0; display: none; font-size: 30px;' title="Passwort einsehen">
                 👁️
             </button>
 
-            <button style='margin: 0;' type='submit'>Anmelden</button><br>
+            <button style='margin: 0;' type='submit' title="Anmelden">Anmelden</button><br>
 
-            <button onclick='nopassword()' type='button'>Ich kenne mein Passwort nicht / <br> Ich hab kein
+            <button onclick='nopassword()' type='button' title="Passwort vergessen / kenne es nicht">Ich kenne mein
+                Passwort nicht / <br> Ich hab kein
                 Passwort erhalten</button>
 
             <br>
 
-            <button type='button'
-                onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; document.getElementById("login-container").style.opacity = "0"; setTimeout(() => { document.getElementById("login-form-2").style.display = "none"; document.getElementById("login-form-1").style.display = "block"; document.getElementById("login-container").style.opacity = "1";}, 500);'>
+            <button type='button' onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; 
+                document.getElementById("login-container").style.opacity = "0"; 
+                setTimeout(() => { document.getElementById("login-form-2").style.display = "none"; 
+                document.getElementById("login-form-1").style.display = "block"; 
+                document.getElementById("login-container").style.opacity = "1";}, 500);' title="Zurück">
                 Zurück
             </button>
         </form>
@@ -128,58 +167,61 @@
 
             <div>
                 <button type='button' id='spinningbg' class='selected' style='background: gray; color: black;'
-                    onclick='changebg("spinning")'>
+                    onclick='changebg("spinning")' title="Drehender Kreis">
                     Drehender Kreis
                 </button>
 
                 <button type='button' id='wavebg' class='notselected' style='background: gray; color: black;'
-                    onclick='changebg("wave")'>
+                    onclick='changebg("wave")' title="Welle">
                     Welle
                 </button>
 
                 <button type='button' id='rainbg' class='notselected' style='background: gray; color: black;'
-                    onclick='changebg("rain")'>
+                    onclick='changebg("rain")' title="Regen">
                     Regen
                 </button>
 
                 <button type='button' id='slidebg' class='notselected' style='background: gray; color: black;'
-                    onclick='changebg("slide")'>
+                    onclick='changebg("slide")' title="Slidende Diagonalen">
                     Slidende Diagonalen
                 </button>
 
                 <button type='button' id='blackbg' class='notselected'
-                    style='background: linear-gradient(to right, rgb(17, 17, 17), gray)' onclick='changebg("black")'>
+                    style='background: linear-gradient(to right, rgb(17, 17, 17), gray)' onclick='changebg("black")'
+                    title="Schwarz - Grau">
                     Schwarz - Grau
                 </button>
                 <button type='button' id='bluebg' class='notselected'
-                    style='background: linear-gradient(to right, blue, red)' onclick='changebg("blue")'>
+                    style='background: linear-gradient(to right, blue, red)' onclick='changebg("blue")'
+                    title="Blau - Rot">
                     Blau - Rot
                 </button>
                 <button type='button' id='greenbg' class='notselected'
                     style='background: linear-gradient(to right, Green, Yellow); color: black;'
-                    onclick='changebg("green")'>
+                    onclick='changebg("green")' title="Grün - Gelb">
                     Grün - Gelb
                 </button>
                 <button type='button' id='redbg' class='notselected'
-                    style='background: linear-gradient(to right, red, orange); color: black;' onclick='changebg("red")'>
+                    style='background: linear-gradient(to right, red, orange); color: black;' onclick='changebg("red")'
+                    title="Rot - Orange">
                     Rot - Orange
                 </button>
 
                 <button type='button' id='lilabg' class='notselected'
                     style='background: linear-gradient(to right, purple, blue); color: white;'
-                    onclick='changebg("lila")'>
+                    onclick='changebg("lila")' title="Lola - Blau">
                     Lila - Blau
                 </button>
 
                 <button type='button' id='bluegreenbg' class='notselected'
                     style='background: linear-gradient(to right, blue, green); color: white;'
-                    onclick='changebg("bluegreen")'>
+                    onclick='changebg("bluegreen")' title="Blau - Grün">
                     Blau - Grün
                 </button>
 
                 <button type='button' id='greenredbg' class='notselected'
                     style='background: linear-gradient(to right, green, red); color: white;'
-                    onclick='changebg("greenred")'>
+                    onclick='changebg("greenred")' title="Grün -Rot">
                     Grün - Rot
                 </button>
             </div>
@@ -188,11 +230,14 @@
 
             <br>
 
-            <button type='button'
-                onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; document.getElementById("login-container").style.opacity = "0"; setTimeout(() => { document.getElementById("login-form-3").style.display = "none"; document.getElementById("login-form-2").style.display = "block"; document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
+            <button type='button' onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; 
+                document.getElementById("login-container").style.opacity = "0"; 
+                setTimeout(() => { document.getElementById("login-form-3").style.display = "none";
+                document.getElementById("login-form-2").style.display = "block"; 
+                document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
         </form>
         <form id='login-form-4' style='display: none;'>
-            <label for='password' style='margin-top: 0;'>Wie möchtest du genannt werden?</label>
+            <label for='displayname' style='margin-top: 0;'>Wie möchtest du genannt werden?</label>
 
             <input style='text-align: center' type='text' id='displayname' required />
 
@@ -200,8 +245,11 @@
 
             <br>
 
-            <button type='button'
-                onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; document.getElementById("login-container").style.opacity = "0"; setTimeout(() => { document.getElementById("login-form-4").style.display = "none"; document.getElementById("login-form-3").style.display = "block"; document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
+            <button type='button' onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; 
+                document.getElementById("login-container").style.opacity = "0"; 
+                setTimeout(() => { document.getElementById("login-form-4").style.display = "none";
+                document.getElementById("login-form-3").style.display = "block"; 
+                document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
         </form>
         <form id='login-form-5' style='display: none;'>
             <label for='password' style='margin-top: 0;'>Erlaubst du die Speicherung von Einstellungen? (sonst jedes Mal
@@ -216,8 +264,11 @@
 
             <br>
 
-            <button type='button'
-                onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; document.getElementById("login-container").style.opacity = "0"; setTimeout(() => { document.getElementById("login-form-5").style.display = "none"; document.getElementById("login-form-4").style.display = "block"; document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
+            <button type='button' onclick='document.getElementById("login-container").style.transition = "opacity 0.5s"; 
+                document.getElementById("login-container").style.opacity = "0"; 
+                setTimeout(() => { document.getElementById("login-form-5").style.display = "none"; 
+                document.getElementById("login-form-4").style.display = "block"; 
+                document.getElementById("login-container").style.opacity = "1";}, 500);'>Zurück</button>
         </form>
     </div>
     <div id='countdown' style="display: none; z-index: unset;">
@@ -242,7 +293,7 @@
         <div class='link-container' id='link-container'>
             <h3 id='maths'><u>Mathe Lösungen</u></h3>
 
-            <a href='Maths/index.html' id='device-infos'><span>Alle Lösungen</span></a>
+            <a href='Maths/index.html'><span>Alle Lösungen</span></a>
 
             <h3 id='voc'><u>Vokabeln</u></h3>
 
@@ -258,12 +309,13 @@
         </div>
     </div>
 
-    <div id='tutorial-overlay'
-        style='display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999997; transition: opacity 1s; opacity: 0;'>
+    <div id='tutorial-overlay' style='display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.8); z-index: 999997; transition: opacity 1s; opacity: 0;'>
 
     </div>
-    <div id='tutorial-content'
-        style='position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2d2d2d; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center; color: white; z-index: 999999; display: none;transition: opacity 1s; opacity: 0;'>
+    <div id='tutorial-content' style='position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        background: #2d2d2d; border-radius: 20px; padding: 30px; max-width: 500px; text-align: 
+        center; color: white; z-index: 999999; display: none;transition: opacity 1s; opacity: 0;'>
         <h2 id='tutorial-title' style='margin-bottom: 20px; color: #ff6b6b; margin-top: 0;'>
             Willkommen beim Dashboard!
         </h2>
@@ -273,25 +325,25 @@
         </p>
 
         <div style='display: flex; justify-content: space-between; gap: 10px;'>
-            <button id='tutorial-prev' onclick='stutorialPrev()'
-                style='padding: 10px 20px; background: #666; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>
+            <button id='tutorial-prev' onclick='stutorialPrev()' style='padding: 10px 20px; background: #666; color: white; 
+                border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>
                 Zurück
             </button>
 
-            <button id='tutorial-next' onclick='stutorialNext()'
-                style='padding: 10px 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>
+            <button id='tutorial-next' onclick='stutorialNext()' style='padding: 10px 20px; background: #ff6b6b; color: white; 
+                border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>
                 Weiter
             </button>
 
-            <button id='tutorial-skip' onclick='stutorialSkip()'
-                style='padding: 10px 20px; background: #444; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;'>
+            <button id='tutorial-skip' onclick='stutorialSkip()' style='padding: 10px 20px; background: #444; color: white; border: none; 
+                border-radius: 10px; cursor: pointer; font-size: 16px;'>
                 Beenden
             </button>
         </div>
     </div>
 
-    <div id='tutorial-highlight'
-        style='position: fixed; border: 3px solid #ff6b6b; border-radius: 10px; background: rgba(255,107,107,0.1); pointer-events: none; z-index: 10000000000; display: none;'>
+    <div id='tutorial-highlight' style='position: fixed; border: 3px solid #ff6b6b; border-radius: 10px; 
+        background: rgba(255,107,107,0.1); pointer-events: none; z-index: 10000000000; display: none;'>
     </div>
 
     <button class='settings' onclick='settings()' id='shopbt'

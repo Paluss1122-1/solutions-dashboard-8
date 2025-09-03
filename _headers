@@ -1,0 +1,47 @@
+/index.html
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/Files/Default/index.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/Files/Module/index.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/Files/Style/style.css
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/sitemap.xml
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/robots.txt
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/favicon.ico
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/settings.png
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/green-arrow.webp
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.mp4
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
