@@ -608,12 +608,40 @@ function start() {
             localStorage.getItem('password') &&
             !localStorage.getItem('bg-color') &&
             localStorage.getItem('displayname') &&
-            localStorage.getItem('allowedcookies' ||
-                localStorage.getItem('username') &&
-                localStorage.getItem('password') &&
-                localStorage.getItem('bg-color') == 'null' &&
-                localStorage.getItem('displayname') &&
-                localStorage.getItem('allowedcookies'))
+            localStorage.getItem('allowedcookies')
+        ) {
+            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
+            setTimeout(() => {
+                startp.style.opacity = '1';
+            }, 10);
+            setTimeout(() => {
+                startp.style.transition = 'opacity 1s';
+                startp.style.opacity = '0';
+                loginContainer.style.display = 'block';
+                loginform1.style.display = 'none';
+                loginform2.style.display = 'none';
+                loginform3.style.display = 'block';
+                loginform4.style.display = 'none';
+                loginform5.style.display = 'none';
+                loginContainer.style.transition = 'opacity 1s';
+                setTimeout(() => {
+                    loginContainer.style.opacity = '1';
+                }, 100);
+                bgiframe.style.filter = 'saturate(1)';
+                setTimeout(() => {
+                    startp.style.display = 'none';
+                }, 1000);
+            }, 3000);
+            changebg(founduser.bgcolor);
+            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
+            return;
+        };
+
+        if (localStorage.getItem('username') &&
+            localStorage.getItem('password') &&
+            localStorage.getItem('bg-color') == 'null' &&
+            localStorage.getItem('displayname') &&
+            localStorage.getItem('allowedcookies')
         ) {
             startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
             setTimeout(() => {
