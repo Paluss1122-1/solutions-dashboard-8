@@ -112,6 +112,22 @@ async function nutzerdatenAendern(username, neueDaten) {
 // Funktion global verfügbar machen
 window.nutzerdatenAendern = nutzerdatenAendern;
 
+async function reporterror(errorMessage) {
+    try {
+        const { error } = await supabase.from('Fehlerberichte').insert([{
+            userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
+            zeit: new Date().toISOString(),
+            fehler: errorMessage
+        }]);
+        if (error) {
+            console.error('Fehler beim Senden des Fehlerberichts:', error.message);
+        }
+    } catch (err) {
+        console.error('Unerwarteter Fehler beim Senden des Fehlerberichts:', err);
+    }
+}
+
+window.reporterror = reporterror;
 
 // Hilfsfunktionen für Browser-Erkennung
 function getBrowserName() {
