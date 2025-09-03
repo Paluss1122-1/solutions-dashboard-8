@@ -778,7 +778,12 @@ function start() {
             localStorage.getItem('password') &&
             !localStorage.getItem('bg-color') &&
             localStorage.getItem('displayname') &&
-            localStorage.getItem('allowedcookies')
+            localStorage.getItem('allowedcookies' ||
+                localStorage.getItem('username') &&
+                localStorage.getItem('password') &&
+                localStorage.getItem('bg-color') == 'null' &&
+                localStorage.getItem('displayname') &&
+                localStorage.getItem('allowedcookies'))
         ) {
             startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
             setTimeout(() => {
