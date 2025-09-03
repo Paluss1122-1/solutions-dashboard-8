@@ -429,7 +429,7 @@ function changebg(color) {
         });
     }
 
-    function handleSpecialBg(bgName, scale, src, isVideo = true) {
+    function handleSpecialBg(bgName, scale, src) {
         black.style.display = 'block';
         black.style.opacity = '0';
         black.style.transition = 'opacity 1s';
@@ -477,13 +477,12 @@ function changebg(color) {
     }
 
     // Für normale Farbverläufe
-    const selectedButton = buttons.find((button) => button.id.includes(color));
+    const selectedButton = buttons.find((button) => button.id === color + 'bg' || button.id === color + 'bg1');
 
     if (selectedButton) {
         // Nur wenn NICHT einer der Spezialtypen, dann Video ausblenden
-        if (!['spinning', 'wave', 'rain', 'slide'].includes(color)) {
-            bgiframe.style.opacity = '0';
-            bgiframe.src = '';
+        if (color && ['spinning', 'wave', 'rain', 'slide'].includes(color)) {
+            changebg(color);
         }
         black.style.display = 'block';
         black.style.opacity = '0';
@@ -774,6 +773,39 @@ function start() {
             SendAnalyticsStep('Nutzer hat alle Daten bis auf allowedcookies, cookies frame wird nun angezeigt');
             return;
         }
+
+        if (localStorage.getItem('username') &&
+            localStorage.getItem('password') &&
+            !localStorage.getItem('bg-color') &&
+            localStorage.getItem('displayname') &&
+            localStorage.getItem('allowedcookies')
+        ) {
+            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
+            setTimeout(() => {
+                startp.style.opacity = '1';
+            }, 10);
+            setTimeout(() => {
+                startp.style.transition = 'opacity 1s';
+                startp.style.opacity = '0';
+                loginContainer.style.display = 'block';
+                loginform1.style.display = 'none';
+                loginform2.style.display = 'none';
+                loginform3.style.display = 'block';
+                loginform4.style.display = 'none';
+                loginform5.style.display = 'none';
+                loginContainer.style.transition = 'opacity 1s';
+                setTimeout(() => {
+                    loginContainer.style.opacity = '1';
+                }, 100);
+                bgiframe.style.filter = 'saturate(1)';
+                setTimeout(() => {
+                    startp.style.display = 'none';
+                }, 1000);
+            }, 3000);
+            changebg(founduser.bgcolor);
+            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
+            return;
+        };
 
         // Kein Login-Status vorhanden - alles zurücksetzen
         localStorage.clear();
