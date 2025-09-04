@@ -145,7 +145,7 @@ function getBrowserName() {
 
 window.SendAnalyticsStep = async function (action) {
     let user = null;
-    if (founduser) {
+    if (founduser || localStorage.getItem('username')) {
         try {
             user = localStorage.getItem('username');
         } catch (e) {
