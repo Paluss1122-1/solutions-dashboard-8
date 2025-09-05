@@ -520,6 +520,8 @@ function start() {
             return;
         }
 
+        window.SendAnalyticsStep('Website besucht!')
+
         // Nutzer aus localStorage finden
         if (localStorage.getItem('username')) {
             users.forEach(function (user) {

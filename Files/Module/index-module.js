@@ -183,10 +183,6 @@ window.SendAnalyticsStep = async function (action) {
     }
 }
 
-setTimeout(() => {
-    window.SendAnalyticsStep('Website besucht!')
-}, 3000);
-
 async function update() {
     try {
         const { data, error } = await supabase
