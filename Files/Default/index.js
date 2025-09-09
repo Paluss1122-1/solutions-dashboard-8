@@ -520,8 +520,6 @@ function start() {
             return;
         }
 
-        window.SendAnalyticsStep('Website besucht!')
-
         // Nutzer aus localStorage finden
         if (localStorage.getItem('username')) {
             users.forEach(function (user) {
@@ -605,6 +603,8 @@ function start() {
             nutzerdatenAendern(founduser.username, { bgcolor: localStorage.getItem('bg-color') });
             SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert');
         }
+
+        window.SendAnalyticsStep('Website besucht!')
 
         if (localStorage.getItem('username') &&
             localStorage.getItem('password') &&
