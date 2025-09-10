@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
   <meta charset="UTF-8">
   <title>Website-Analytics</title>
@@ -13,26 +12,9 @@
       margin: auto;
       background-color: gray;
     }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .stat {
-      background: rgb(234, 234, 234);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .visit-entry {
-      border-top: 1px solid #eee;
-      padding-top: 0.5rem;
-      margin-top: 0.5rem;
-      border-bottom: 1px gray solid;
-    }
-
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .stat { background: rgb(234, 234, 234); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .visit-entry { border-top: 1px solid #eee; padding-top: 0.5rem; margin-top: 0.5rem; border-bottom: 1px gray solid; }
     .access-denied {
       text-align: center;
       padding: 50px;
@@ -42,15 +24,11 @@
       margin: 20px;
       border: 1px solid #f5c6cb;
     }
-
-    .access-denied h1 {
-      color: #721c24;
-      margin-bottom: 20px;
-    }
+    .access-denied h1 { color: #721c24; margin-bottom: 20px; }
   </style>
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    
+
     // Zugangskontrolle
     function checkAccess() {
       const username = localStorage.getItem('username');
@@ -68,15 +46,9 @@
       return true;
     }
 
-    // Zugangskontrolle beim Laden der Seite
-    if (!checkAccess()) {
-      
-      throw new Error('Zugang verweigert');
-    }
-    
-    // Supabase Konfiguration
+    // Supabase Config
     const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     async function ladeAnalytics() {
@@ -87,9 +59,10 @@
         const { data, error } = await supabase
           .from("analytics")
           .select("*")
-          .order("datum", { ascending: false });
+          .order("datum", { ascending: false }); // ACHTUNG: Spaltenname prüfen!
 
         if (error) {
+          console.error("Supabase Fehler:", error);
           container.innerHTML = `<p>Fehler beim Laden: ${error.message}</p>`;
           return;
         }
@@ -105,25 +78,29 @@
           div.className = "visit-entry";
           div.innerHTML = `
             <p><strong>ID:</strong> ${entry.id || "-"}</p>
-            <p>🕓 Zeit: ${entry.zeit || "-"}</p>
+            <p>🕓 Zeit: ${entry.zeit || entry.datum || "-"}</p>
             <p>🧭 Browser: ${entry.browser || "-"}</p>
             <p>📱 Gerät: ${entry.device || "-"}</p>
             <p>🌐 Website: ${entry.link || "-"}</p>
             <p>👤 Person: ${entry.name || "-"}</p>
-            <p>👤 Aktion: ${entry.Action || "-"}</p>
+            <p>⚡ Aktion: ${entry.action || entry.Action || "-"}</p>
           `;
           container.appendChild(div);
         });
 
       } catch (e) {
+        console.error("JS Fehler:", e);
         container.innerHTML = `<p>Fehler beim Laden der Daten: ${e.message}</p>`;
       }
     }
 
-    window.addEventListener("DOMContentLoaded", ladeAnalytics);
+    window.addEventListener("DOMContentLoaded", () => {
+      if (checkAccess()) {
+        ladeAnalytics();
+      }
+    });
   </script>
 </head>
-
 <body>
   <h1>📊 Analytics-Einträge</h1>
   <div class="stat">
@@ -131,5 +108,4 @@
     <div id="besuche"></div>
   </div>
 </body>
-
 </html>
