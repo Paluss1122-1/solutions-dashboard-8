@@ -304,7 +304,7 @@
 
             <h3 id='device-infos-text'><u>Hausaufgaben Organisieren</u></h3>
 
-            <a href='Editor/index.html' id='latein'><span>Hausaufgaben Editor</span></a>
+            <a href='https://homework-editor.netlify.app/' id='he' target="_blank"><span>Hausaufgaben Editor</span></a>
 
             <h3 id='device-infos-text'><u>Geräte Informationen</u></h3>
 
@@ -458,6 +458,12 @@
 
     <script type='module' src="Files/Module/index-module.js"></script>
     <script src="Files/Default/index.js"></script>
+
+    <script>
+        window.onload = function() {
+            document.getElementById('he').setAttribute('href', `https://homework-editor.netlify.app/#${localStorage.getItem('username')}`)
+        }
+    </script>
 </body>
 
 </html>

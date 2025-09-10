@@ -513,7 +513,6 @@ function start() {
     setTimeout(() => {
         intro.remove()
     }, 1000);
-    //if (localStorage.getItem('username') !== 'Paluss1122') return
     setTimeout(() => {
         // Warten bis die Nutzer aus Supabase geladen sind
         if (users.length === 0) {
