@@ -289,13 +289,112 @@
                 jumpButton.addEventListener('click', goToActualPage);
             }
         });
+
+        let users = [];
+        let founduser = null
+
+        // Funktion zum Laden der Nutzer
+        async function ladeNutzer() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('username, password, displayname, allowedcookies, bgcolor');
+
+                if (error) {
+                    throw new Error(`Fehler beim Laden der Nutzer: ${error.message}`);
+                }
+
+                users = data || [];
+
+                if (localStorage.getItem('username')) {
+                    users.forEach(function (user) {
+                        if (user.username === localStorage.getItem('username')) {
+                            founduser = user;
+                        }
+                    });
+                }
+
+                wartungsarbeiten()
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        ladeNutzer()
+
+        async function wartungsarbeiten() {
+            const { data, error } = await supabase
+                .from('general')
+                .select('*')
+                .single();
+
+            if (data.released === false) {
+                let showMaintenance = false;
+                const active = data && data.Wartungsarbeiten;
+
+                if (founduser) {
+                    try {
+                        if (founduser.username === "Paluss1122" && active) {
+                            showMaintenance = false;
+                            document.title = 'Latein Vokabeln';
+                        } else {
+                            document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                            showMaintenance = active;
+                        }
+                    } catch (e) {
+                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                        console.error("Fehler beim Parsen des Benutzers:", e);
+                        showMaintenance = active;
+                    }
+                } else if (localStorage.getItem('username')) {
+                    if (localStorage.getItem('username') === "Paluss1122" && active) {
+                        showMaintenance = false;
+                        document.title = 'Latein Vokabeln';
+                    } else {
+                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                        showMaintenance = active;
+                    }
+                } else {
+                    document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                    showMaintenance = active;
+                }
+
+                const maintenanceFrame = document.getElementById("maintenance-frame");
+                if (maintenanceFrame) {
+                    if (showMaintenance === true) {
+                        maintenanceFrame.style.display = 'flex';
+                        maintenanceFrame.style.opacity = '1';
+                    } else {
+                        maintenanceFrame.style.opacity = '1';
+                        setTimeout(() => {
+                            maintenanceFrame.style.display = 'none';
+                        }, 1000);
+                    }
+                }
+
+                document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
+                document.getElementById("why-ws").innerText = data.Grund;
+            }
+        }
     </script>
 </head>
 
 <body>
+    <div id="maintenance-frame"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,1); 
+        color:white; z-index:999999; align-items:center; justify-content:center; flex-direction:column; font-size:2em; opacity: 0; transition: opacity 1s;">
+        <div style="width: 100%; text-align: center;">
+            <h1 style="width: 100%;; font-size:xx-large">⚠️ Wartungsarbeiten</h1>
+            <p style="width: 100%;">Aktuell finden Wartungsarbeiten statt!</p>
+            <p style="width: 100%;">Vorraussichtliche Dauer: <span id="time-ws"></span></p>
+            <p style="width: 100%;">Grund: <span id="why-ws"></span></p>
+        </div>
+    </div>
     <button onclick="window.location = 'https://solutions-dashboard-8.netlify.app'"
         style="position: fixed; width: 20%; left: 1%; top: 1%; height: auto; background: none; border: none; cursor: pointer; box-shadow: none;">
-        <img src="arrow-left.png" alt="Zurück" style="width: 100%; height: auto; border: none; aspect-ratio: 1; box-shadow: none;">
+        <img src="arrow-left.png" alt="Zurück"
+            style="width: 100%; height: auto; border: none; aspect-ratio: 1; box-shadow: none;">
     </button>
 
     <div id="loadingOverlay" style="display: none;">
@@ -316,6 +415,28 @@
         </div>
         <p id="pageNumber">Seite 1 von 18</p>
     </div>
+    <script>
+        function checkAccess() {
+            const username = localStorage.getItem('loggedInUser_Paluss1122_sdb');
+            if (!username) {
+                document.body.innerHTML = `
+          <div class="access-denied">
+            <h1>🚫 Zugang verweigert</h1>
+            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+            <p>Du musst angemeldet sein!</p>
+            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
+          </div>
+        `;
+                return false;
+            }
+            return true;
+        }
+
+        // Zugangskontrolle beim Laden der Seite
+        if (!checkAccess()) {
+          throw new Error('Zugang verweigert');
+        }
+    </script>
 </body>
 
 </html>
