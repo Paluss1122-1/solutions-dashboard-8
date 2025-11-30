@@ -322,6 +322,7 @@
 
                 if (page !== null) {
                     currentPage = page;
+                    SendAnalyticsStep(`Aufgabe gesucht: ${pageInput}`)
                     preloadImages();
                     updatePage();
                 } else {
@@ -386,7 +387,7 @@
             }
 
             const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-            if (!isLocal) {
+            if (isLocal) {
                 try {
                     const { error } = await supabase.from('analytics').insert([{
                         browser: getBrowserName(),
@@ -402,6 +403,7 @@
                             zeit: new Date().toISOString(),
                             fehler: error.message || error
                         }]);
+                        console.log(error.message)
                     }
                 } catch (err) {
                     await supabase.from('Fehlerberichte').insert([{
@@ -409,13 +411,12 @@
                         zeit: new Date().toISOString(),
                         fehler: err.message || err
                     }]);
+                        console.log(err)
                 }
             }
         }
 
-        window.SendAnalyticsStep('Website besucht!')
-
-
+        SendAnalyticsStep('Mathe besucht!')
 
         let users = [];
         let founduser = null

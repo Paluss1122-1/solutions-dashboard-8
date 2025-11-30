@@ -123,6 +123,16 @@ const tutorialSteps = [
         highlight: 'dashboard'
     },
     {
+        title: 'Hausaufgaben Organizieren',
+        text: 'Hier kannst du deine Hausaufgaben speichern',
+        highlight: 'he'
+    },
+    {
+        title: 'Kalender',
+        text: 'Hier findest du alle Events des IKGs',
+        highlight: 'ca'
+    },
+    {
         title: 'Tutorial abgeschlossen! ✅',
         text: 'Perfekt! Du weißt jetzt, wie du zu den Einstellungen gelangst. Viel Spaß beim Erkunden deines Dashboards!',
         highlight: null
@@ -167,7 +177,7 @@ function updateTutorialStep() {
     }
 
     // Tutorial-Overlay zurücksetzen (falls von Step 2)
-    if (tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4) {
+    if (tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 5 && tutorialStep !== 6) {
         tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
         tutorialOverlay.style.zIndex = '999999';
         const tutorialContent = document.getElementById('tutorial-content');
@@ -176,7 +186,7 @@ function updateTutorialStep() {
             tutorialContent.style.bottom = 'unset';
             tutorialContent.style.transform = 'translate(-50%, -50%)';
         }
-    } else if (tutorialStep == 4) {
+    } else if (tutorialStep == 4 || tutorialStep == 5 || tutorialStep == 6) {
         tutorialOverlay.style.background = 'rgba(0,0,0,0.8)';
         tutorialOverlay.style.zIndex = '999999';
         const tutorialContent = document.getElementById('tutorial-content');
@@ -607,7 +617,7 @@ function start() {
             SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert');
         }
 
-        window.SendAnalyticsStep('Website besucht!')
+        SendAnalyticsStep('SDB8 besucht!')
 
         if (localStorage.getItem('username') &&
             localStorage.getItem('password') &&
