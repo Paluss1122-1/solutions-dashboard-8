@@ -312,17 +312,38 @@
       .user-details {
         grid-template-columns: 1fr;
       }
-      
+
       .modal-content {
         width: 95%;
         margin: 10% auto;
       }
-      
+
       .btn-group {
         flex-direction: column;
       }
     }
   </style>
+  <script>
+    async function copyCredentials(username) {
+      const user = users.find(u => u.username === username);
+      if (!user) {
+        zeigeNachricht('Nutzer nicht gefunden!', 'error');
+        return;
+      }
+
+      const text = `Nutzername: ${user.username}
+Passwort: ${user.password || '-'}
+Website: solutiosn-dashboard-8.netlify.app`;
+
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    window.copyCredentials = copyCredentials;
+  </script>
 </head>
 
 <body>
@@ -334,7 +355,7 @@
 
     <div class="content">
       <button class="refresh-btn" onclick="ladeNutzer()">🔄 Daten neu laden</button>
-      
+
       <div id="message"></div>
       <div id="loading" class="loading">Lade Nutzerdaten...</div>
       <div id="userList" class="user-list"></div>
@@ -348,37 +369,38 @@
         <h2 class="modal-title">Nutzer bearbeiten</h2>
         <span class="close" onclick="closeModal()">&times;</span>
       </div>
-      
+
       <form id="editForm">
         <div class="form-group">
           <label class="form-label">Benutzername:</label>
           <input type="text" id="editUsername" class="form-input" readonly>
         </div>
-        
-                 <div class="form-group">
-           <label class="form-label">Passwort:</label>
-           <input type="text" id="editPassword" class="form-input" placeholder="Passwort eingeben (leer lassen für null)">
-         </div>
-         
-         <div class="form-group">
-           <label class="form-label">Anzeigename:</label>
-           <input type="text" id="editDisplayname" class="form-input" placeholder="Anzeigename (leer lassen für null)">
-         </div>
-         
-         <div class="form-group">
-           <label class="form-label">Cookies erlaubt:</label>
-           <select id="editAllowedcookies" class="form-input">
-             <option value="true">✅ Ja</option>
-             <option value="false">❌ Nein</option>
-             <option value="null">null</option>
-           </select>
-         </div>
-         
-         <div class="form-group">
-           <label class="form-label">Hintergrundfarbe:</label>
-           <input type="text" id="editBgcolor" class="form-input" placeholder="Hintergrundfarbe (leer lassen für null)">
-         </div>
-        
+
+        <div class="form-group">
+          <label class="form-label">Passwort:</label>
+          <input type="text" id="editPassword" class="form-input"
+            placeholder="Passwort eingeben (leer lassen für null)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Anzeigename:</label>
+          <input type="text" id="editDisplayname" class="form-input" placeholder="Anzeigename (leer lassen für null)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cookies erlaubt:</label>
+          <select id="editAllowedcookies" class="form-input">
+            <option value="true">✅ Ja</option>
+            <option value="false">❌ Nein</option>
+            <option value="null">null</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hintergrundfarbe:</label>
+          <input type="text" id="editBgcolor" class="form-input" placeholder="Hintergrundfarbe (leer lassen für null)">
+        </div>
+
         <div class="btn-group">
           <button type="submit" class="btn btn-success">💾 Speichern</button>
           <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Abbrechen</button>
@@ -389,7 +411,7 @@
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    
+
     // Zugangskontrolle
     function checkAccess() {
       const username = localStorage.getItem('username');
@@ -412,7 +434,7 @@
       // Stoppe die weitere Ausführung
       throw new Error('Zugang verweigert');
     }
-    
+
     // Supabase Konfiguration
     const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE";
@@ -426,10 +448,11 @@
       const loadingDiv = document.getElementById('loading');
       const userListDiv = document.getElementById('userList');
       const messageDiv = document.getElementById('message');
-      
+
       loadingDiv.style.display = 'block';
       userListDiv.innerHTML = '';
       messageDiv.innerHTML = '';
+
 
       try {
         const { data, error } = await supabase
@@ -441,8 +464,9 @@
         }
 
         users = data || [];
+        window.users = data
         zeigeNutzer(users);
-        
+
       } catch (error) {
         zeigeNachricht(`Fehler: ${error.message}`, 'error');
       } finally {
@@ -453,7 +477,7 @@
     // Funktion zum Anzeigen der Nutzer
     function zeigeNutzer(nutzerListe) {
       const userListDiv = document.getElementById('userList');
-      
+
       if (nutzerListe.length === 0) {
         userListDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">Keine Nutzer gefunden.</p>';
         return;
@@ -464,6 +488,8 @@
           <div class="user-header">
             <div class="user-name">${user.displayname || user.username}</div>
             <button class="edit-btn" onclick="bearbeiteNutzer('${user.username}')">✏️ Bearbeiten</button>
+            <button class="edit-btn" style="margin-left:8px"
+                onclick="copyCredentials('${user.username}')">📋 Kopieren</button>
           </div>
                       <div class="user-details">
               <div class="detail-item">
@@ -501,7 +527,7 @@
     }
 
     // Funktion zum Bearbeiten eines Nutzers
-    window.bearbeiteNutzer = function(username) {
+    window.bearbeiteNutzer = function (username) {
       const user = users.find(u => u.username === username);
       if (!user) {
         zeigeNachricht('Nutzer nicht gefunden!', 'error');
@@ -509,30 +535,30 @@
       }
 
       currentEditUser = user;
-      
-             // Formular mit aktuellen Werten füllen
-       document.getElementById('editUsername').value = user.username;
-       document.getElementById('editPassword').value = user.password || '';
-       document.getElementById('editDisplayname').value = user.displayname || '';
-       
-       // Cookies-Wert setzen
-       const cookiesSelect = document.getElementById('editAllowedcookies');
-       if (user.allowedcookies === null) {
-         cookiesSelect.value = 'null';
-       } else if (user.allowedcookies === true) {
-         cookiesSelect.value = 'true';
-       } else {
-         cookiesSelect.value = 'false';
-       }
-       
-       document.getElementById('editBgcolor').value = user.bgcolor || '';
-      
+
+      // Formular mit aktuellen Werten füllen
+      document.getElementById('editUsername').value = user.username;
+      document.getElementById('editPassword').value = user.password || '';
+      document.getElementById('editDisplayname').value = user.displayname || '';
+
+      // Cookies-Wert setzen
+      const cookiesSelect = document.getElementById('editAllowedcookies');
+      if (user.allowedcookies === null) {
+        cookiesSelect.value = 'null';
+      } else if (user.allowedcookies === true) {
+        cookiesSelect.value = 'true';
+      } else {
+        cookiesSelect.value = 'false';
+      }
+
+      document.getElementById('editBgcolor').value = user.bgcolor || '';
+
       // Modal öffnen
       document.getElementById('editModal').style.display = 'block';
     }
 
     // Funktion zum Schließen des Modals
-    window.closeModal = function() {
+    window.closeModal = function () {
       document.getElementById('editModal').style.display = 'none';
       currentEditUser = null;
     }
@@ -541,7 +567,7 @@
     function zeigeNachricht(message, type) {
       const messageDiv = document.getElementById('message');
       messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
-      
+
       // Nachricht nach 5 Sekunden ausblenden
       setTimeout(() => {
         messageDiv.innerHTML = '';
@@ -549,31 +575,31 @@
     }
 
     // Event Listener für das Formular
-    document.getElementById('editForm').addEventListener('submit', async function(e) {
+    document.getElementById('editForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      
+
       if (!currentEditUser) {
         zeigeNachricht('Kein Nutzer zum Bearbeiten ausgewählt!', 'error');
         return;
       }
 
-             // Cookies-Wert verarbeiten
-       const cookiesValue = document.getElementById('editAllowedcookies').value;
-       let allowedcookies = null;
-       if (cookiesValue === 'true') {
-         allowedcookies = true;
-       } else if (cookiesValue === 'false') {
-         allowedcookies = false;
-       } else {
-         allowedcookies = null;
-       }
+      // Cookies-Wert verarbeiten
+      const cookiesValue = document.getElementById('editAllowedcookies').value;
+      let allowedcookies = null;
+      if (cookiesValue === 'true') {
+        allowedcookies = true;
+      } else if (cookiesValue === 'false') {
+        allowedcookies = false;
+      } else {
+        allowedcookies = null;
+      }
 
-       const neueDaten = {
-         password: document.getElementById('editPassword').value.trim() || null,
-         displayname: document.getElementById('editDisplayname').value.trim() || null,
-         allowedcookies: allowedcookies,
-         bgcolor: document.getElementById('editBgcolor').value.trim() || null
-       };
+      const neueDaten = {
+        password: document.getElementById('editPassword').value.trim() || null,
+        displayname: document.getElementById('editDisplayname').value.trim() || null,
+        allowedcookies: allowedcookies,
+        bgcolor: document.getElementById('editBgcolor').value.trim() || null
+      };
 
       try {
         const { error } = await supabase
@@ -600,8 +626,9 @@
       }
     });
 
+
     // Modal schließen beim Klick außerhalb
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const modal = document.getElementById('editModal');
       if (event.target === modal) {
         closeModal();
@@ -609,7 +636,7 @@
     }
 
     // ESC-Taste zum Schließen des Modals
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         closeModal();
       }
@@ -620,4 +647,4 @@
   </script>
 </body>
 
-</html> 
+</html>
