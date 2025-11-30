@@ -19,7 +19,7 @@
             margin: 20px auto;
             max-width: 800px;
             position: relative;
-            z-index: 0;
+            z-index: 100;
         }
 
         img {
@@ -39,6 +39,7 @@
             justify-content: space-between;
             left: 50%;
             transform: translate(-50%, -20%);
+            pointer-events: none; /* alles durchlassen */
         }
 
         .buttons button {
@@ -56,6 +57,7 @@
             margin-left: 10px;
             margin-right: 10px;
             color: white;
+            pointer-events: auto;
         }
 
         .buttons button:hover {
@@ -525,7 +527,7 @@
         </h2>
 
         <p id='tutorial-text' style='font-size: 18px; line-height: 1.5; margin-bottom: 25px;'>
-            Bestätige bitte hiermiet, dass du keine Screenshots machst, wenn doch du Zugang verlierst für immer
+            Bestätige bitte hiermit, dass du keine Screenshots machst, wenn doch du Zugang verlierst für immer
         </p>
 
         <div style='display: flex; justify-content: center; gap: 10px;'>
@@ -552,15 +554,15 @@
         <h1>Mathe Lösungen</h1>
         <img id="workbookImage" src="pictures/1.jpg" alt="Workbook Seite 1">
 
-        <div class="manual-navigation">
+        <div class="manual-navigation" style="z-index: 1000;">
             <input class="normal" style="width: 90%;" type="text" id="pageInput"
                 placeholder="Seite/Aufgabe eingeben (zb 19/1)" onkeydown="if(event.key === 'Enter') goToPage()">
             <button class="normal"
-                style="display: block; left: 50%; position: relative; transform: translate(-50%); width: auto; margin-top: 5px; margin-bottom: 5px; cursor: pointer;"
+                style="display: block; left: 50%; position: relative; transform: translate(-50%); width: auto; margin-top: 5px; margin-bottom: 5px; cursor: pointer; z-index: 10000;"
                 onclick="goToPage()">Wechseln</button>
         </div>
     </div>
-    <div class="buttons">
+    <div class="buttons" style="z-index: 100000000000;">
         <button id="prevButton" onclick="changePage(-1)" disabled>
             Zurück
         </button>
