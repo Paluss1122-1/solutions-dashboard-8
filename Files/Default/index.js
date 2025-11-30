@@ -225,6 +225,10 @@ function updateTutorialStep() {
                     tutorialContent.style.transform = 'translate(-50%, 0)';
                 }
             }
+            if (tutorialStep == 4) {
+                const tutorialContent = document.getElementById('tutorial-content');
+                tutorialContent.style.zIndex = "10000000"
+            }
         }
     }
 
@@ -564,7 +568,6 @@ function start() {
             newlink3.setAttribute('href', 'Admin/settings.html');
             newlink3.innerHTML = '<span>Einstellungen</span>'
             linkcontainer.appendChild(newlink3);
-            document.getElementById('countdown').style.zIndex = '-100'
             SendAnalyticsStep('Admin Funktionen hinzugefügt');
         }
 
@@ -714,8 +717,6 @@ function start() {
                 document.getElementById('bg-iframe').setAttribute('src', '/');
                 SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
             }
-
-            document.getElementById('countdown').style.display = 'flex';
 
             return;
         }
@@ -1098,8 +1099,6 @@ loginform2.onsubmit = function (event) {
                         document.getElementById('bg-iframe').setAttribute('src', '/');
                         SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
                     }
-
-                    document.getElementById('countdown').style.display = 'flex';
 
                     setTimeout(() => {
                         window.location.reload()

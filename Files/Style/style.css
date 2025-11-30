@@ -13,8 +13,10 @@ body {
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background-repeat: no-repeat;
+    padding-bottom: 30px;
 }
 
 #login-container {
@@ -37,6 +39,7 @@ body {
 #dashboard {
     max-width: 800px;
     margin: 50px auto;
+    margin-bottom: 0;
     padding: 20px;
     background: #2d2d2d;
     border-radius: 8px;
@@ -44,6 +47,10 @@ body {
     transition: opacity 1s;
     text-align: center;
     position: relative;
+}
+
+#scroll-extra {
+    height: 20px; /* oder 300px oder wie viel Platz du willst */
 }
 
 #login-container h2 {

@@ -254,6 +254,11 @@ async function update() {
             if (data.releasedate) {
                 window.releaseTimestamp = new Date(data.releasedate).getTime();
             }
+
+            startCountdown();
+        } else {
+            const countdown = document.getElementById('countdown');
+            countdown.remove()
         }
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
@@ -327,5 +332,3 @@ async function startCountdown() {
         }
     }, 1000);
 }
-
-startCountdown();
