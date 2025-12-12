@@ -1,4 +1,4 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Supabase-Initialisierung für Netlify
 // Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
@@ -263,72 +263,4 @@ async function update() {
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
     }
-}
-
-let released
-
-// Update alle 2 Sekunden für generelle Daten
-if (released == null) {
-    update();
-} else if (released == false) {
-    setInterval(update, 60000);
-} else if (released == true) {
-    setInterval(update, 2000);
-}
-
-async function startCountdown() {
-    let lastValue = "";
-
-    const interval = setInterval(async () => {
-        if (!window.releaseTimestamp) return;
-
-        const cd = document.getElementById("cd");
-        const now = new Date().getTime();
-        const distance = window.releaseTimestamp - now;
-        if (!cd) return;
-        if (cd.style.opacity === "0") {
-            cd.style.opacity = "1";
-        }
-
-        let text;
-        if (distance <= 0) {
-            text = "Bereit!";
-            try {
-                // Erste Zeile updaten → released = true
-                const { data, error } = await supabase
-                    .from("general")
-                    .update({ released: true })
-                    .order("id", { ascending: true })
-                    .limit(1);
-
-                if (error) {
-                    console.error("Fehler beim Aktualisieren:", error.message);
-                    return false;
-                }
-
-                // Timer stoppen, damit nicht jede Sekunde erneut geschrieben wird
-                clearInterval(interval);
-                return true;
-            } catch (err) {
-                console.error("Unerwarteter Fehler:", err);
-                return false;
-            }
-        } else {
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            text = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }
-
-        // Effekt nur bei Änderung triggern
-        if (text !== lastValue) {
-            cd.innerText = text;
-            cd.classList.remove("countdown-change");
-            void cd.offsetWidth; // reflow force für restart
-            cd.classList.add("countdown-change");
-            lastValue = text;
-        }
-    }, 1000);
 }
