@@ -43,9 +43,11 @@ function SendAnalyticsStep(step) {
     }
 }
 
-// Besseres Laden: Wiederholt prüfen, bis das Element existiert, dann zIndex setzen
 function warteAufBubbleButton(versuche = 0) {
     const bubblebt = document.getElementById('chatbase-bubble-button');
+    if (!localStorage.getItem("username")) {
+        bubblebt.style.display = "none"
+    }
     if (bubblebt) {
         bubblebt.style.zIndex = '0';
         bubblebt.onclick = function () {

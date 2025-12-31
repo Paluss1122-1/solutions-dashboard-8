@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <title>Website-Analytics</title>
@@ -12,9 +13,26 @@
       margin: auto;
       background-color: gray;
     }
-    h1 { font-size: 2rem; margin-bottom: 1rem; }
-    .stat { background: rgb(234, 234, 234); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-    .visit-entry { border-top: 1px solid #eee; padding-top: 0.5rem; margin-top: 0.5rem; border-bottom: 1px gray solid; }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat {
+      background: rgb(234, 234, 234);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .visit-entry {
+      border-top: 1px solid #eee;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      border-bottom: 1px gray solid;
+    }
+
     .access-denied {
       text-align: center;
       padding: 50px;
@@ -24,7 +42,11 @@
       margin: 20px;
       border: 1px solid #f5c6cb;
     }
-    .access-denied h1 { color: #721c24; margin-bottom: 20px; }
+
+    .access-denied h1 {
+      color: #721c24;
+      margin-bottom: 20px;
+    }
   </style>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -50,6 +72,8 @@
     const supabaseKey = "sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    let filterActive = false;
+
     async function ladeAnalytics() {
       const container = document.getElementById("besuche");
       container.innerHTML = "<p>Lade Analytics-Daten...</p>";
@@ -73,6 +97,9 @@
 
         container.innerHTML = "";
         data.forEach(entry => {
+          if (filterActive && entry.username === "Paluss1122") {
+            return;
+          }
           const div = document.createElement("div");
           div.className = "visit-entry";
           div.innerHTML = `
@@ -81,7 +108,7 @@
             <p>🧭 Browser: ${entry.browser || "-"}</p>
             <p>📱 Gerät: ${entry.device || "-"}</p>
             <p>🌐 Website: ${entry.link || "-"}</p>
-            <p>👤 Person: ${entry.name || "-"}</p>
+            <p>👤 Person: ${entry.username || "-"}</p>
             <p>⚡ Aktion: ${entry.action || entry.Action || "-"}</p>
           `;
           container.appendChild(div);
@@ -98,13 +125,24 @@
         ladeAnalytics();
       }
     });
+
+    const filterBtn = document.getElementById("filterbt");
+
+    filterBtn.addEventListener("click", () => {
+      filterActive = !filterActive;
+      filterBtn.style.backgroundColor = filterActive ? "lightgreen" : "red";
+      ladeAnalytics();
+    });
   </script>
 </head>
+
 <body>
   <h1>📊 Analytics-Einträge</h1>
+  <button id="filterbt" style="background-color: red; border-radius: 30px; border:none; padding: 10px 30px; left: 50%; transform: translate(-50%); position: absolute; cursor: pointer;">Filtern</button>
   <div class="stat">
     <h2>Letzte Besuche (Supabase)</h2>
     <div id="besuche"></div>
   </div>
 </body>
+
 </html>
