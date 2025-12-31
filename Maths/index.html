@@ -364,7 +364,7 @@
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
         const supabaseUrl = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE';
+        const supabaseKey = 'sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6';
 
         const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -603,9 +603,6 @@
 
         // Lange Berührung / Drag verhindern
         workbookImage.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-        });
-        workbookImage.addEventListener('touchstart', (e) => {
             e.preventDefault();
         });
 

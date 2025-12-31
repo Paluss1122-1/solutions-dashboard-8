@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Supabase-Initialisierung für Netlify
 // Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
 const SUPABASE_URL = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcHNnd25qeHhoenl1ZHZ4eXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTI2NzUsImV4cCI6MjA2OTI4ODY3NX0.WvGmXzoIojeiM8l1GN_e9iRq5C5G2AURiyy96NLjnhE';
+const SUPABASE_KEY = 'sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Nutzer aus Supabase laden
 let users = [];
