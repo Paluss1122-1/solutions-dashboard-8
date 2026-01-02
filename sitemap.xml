@@ -11,6 +11,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://solutions-dashboard-8.netlify.app/Maths/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://solutions-dashboard-8.netlify.app/LoadingScreen/Sliding%20Diagonals/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
