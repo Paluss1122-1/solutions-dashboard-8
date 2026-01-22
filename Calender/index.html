@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             margin-bottom: 30px;
             text-align: center;
         }
@@ -47,7 +48,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .loading {
@@ -73,12 +74,6 @@
             margin-bottom: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .event:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .event-title {
@@ -92,27 +87,19 @@
             flex-wrap: wrap;
             gap: 15px;
             font-size: 0.95em;
-            opacity: 0.9;
-        }
-
-        .event-detail {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            opacity: .9;
         }
 
         .event-description {
             margin-top: 10px;
             padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.3);
-            line-height: 1.5;
+            border-top: 1px solid rgba(255, 255, 255, .3);
         }
 
         .no-events {
             text-align: center;
             padding: 40px;
             color: #999;
-            font-size: 1.1em;
         }
 
         .refresh-btn {
@@ -125,29 +112,20 @@
             cursor: pointer;
             margin: 20px auto;
             display: block;
-            transition: background 0.3s;
         }
 
-        .refresh-btn:hover {
-            background: #764ba2;
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             h1 {
-                font-size: 1.8em;
+                font-size: 1.8em
             }
-            
+
             .calendar-container {
-                padding: 20px;
-            }
-            
-            .event-details {
-                flex-direction: column;
-                gap: 8px;
+                padding: 20px
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -156,10 +134,8 @@
         </header>
 
         <div class="calendar-container">
-            <button class="refresh-btn" onclick="loadCalendar()">🔄 Kalender aktualisieren</button>
-            <div id="content">
-                <div class="loading">Lade Kalender...</div>
-            </div>
+            <button class="refresh-btn" onclick="forceReload()">🔄 Neu laden</button>
+            <div id="content" class="loading">Lade Kalender…</div>
         </div>
     </div>
 
@@ -167,133 +143,81 @@
         function parseICS(icsText) {
             const events = [];
             const lines = icsText.split(/\r?\n/);
-            let currentEvent = null;
+            let current = null;
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
+            for (const raw of lines) {
+                const line = raw.trim();
 
-                if (line === 'BEGIN:VEVENT') {
-                    currentEvent = {};
-                } else if (line === 'END:VEVENT' && currentEvent) {
-                    if (currentEvent.start && currentEvent.summary) {
-                        events.push(currentEvent);
-                    }
-                    currentEvent = null;
-                } else if (currentEvent) {
-                    if (line.startsWith('DTSTART')) {
-                        const dateStr = line.split(':')[1];
-                        currentEvent.start = parseICSDate(dateStr);
-                    } else if (line.startsWith('DTEND')) {
-                        const dateStr = line.split(':')[1];
-                        currentEvent.end = parseICSDate(dateStr);
-                    } else if (line.startsWith('SUMMARY:')) {
-                        currentEvent.summary = line.substring(8);
-                    } else if (line.startsWith('DESCRIPTION:')) {
-                        currentEvent.description = line.substring(12).replace(/\\n/g, '\n');
-                    } else if (line.startsWith('LOCATION:')) {
-                        currentEvent.location = line.substring(9);
-                    }
+                if (line === 'BEGIN:VEVENT') current = {};
+                else if (line === 'END:VEVENT' && current) {
+                    if (current.start && current.summary) events.push(current);
+                    current = null;
+                } else if (current) {
+                    if (line.startsWith('DTSTART')) current.start = parseDate(line);
+                    else if (line.startsWith('DTEND')) current.end = parseDate(line);
+                    else if (line.startsWith('SUMMARY:')) current.summary = line.slice(8);
+                    else if (line.startsWith('DESCRIPTION:'))
+                        current.description = line.slice(12).replace(/\\n/g, '<br>');
+                    else if (line.startsWith('LOCATION:')) current.location = line.slice(9);
                 }
             }
-
             return events.sort((a, b) => a.start - b.start);
         }
 
-        function parseICSDate(dateStr) {
-            if (!dateStr) return null;
-            
-            const year = dateStr.substring(0, 4);
-            const month = dateStr.substring(4, 6);
-            const day = dateStr.substring(6, 8);
-            const hour = dateStr.substring(9, 11) || '00';
-            const minute = dateStr.substring(11, 13) || '00';
-            
-            return new Date(year, month - 1, day, hour, minute);
-        }
-
-        function formatDate(date) {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            return date.toLocaleDateString('de-DE', options);
-        }
-
-        function formatTime(date) {
-            return date.toLocaleTimeString('de-DE', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+        function parseDate(line) {
+            const v = line.split(':')[1];
+            return new Date(
+                v.slice(0, 4),
+                v.slice(4, 6) - 1,
+                v.slice(6, 8),
+                v.slice(9, 11) || 0,
+                v.slice(11, 13) || 0
+            );
         }
 
         function displayEvents(events) {
             const content = document.getElementById('content');
-            
-            if (events.length === 0) {
-                content.innerHTML = '<div class="no-events">📅 Keine Termine gefunden</div>';
+
+            if (!events.length) {
+                content.innerHTML = '<div class="no-events">Keine Termine</div>';
                 return;
             }
 
             const now = new Date();
-            const upcomingEvents = events.filter(e => e.start >= now);
-            
-            let html = '';
-            const eventsToShow = upcomingEvents.length > 0 ? upcomingEvents : events.slice(-10);
-            
-            eventsToShow.forEach(event => {
-                html += `
-                    <div class="event">
-                        <div class="event-title">${event.summary}</div>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                📅 ${formatDate(event.start)}
-                            </div>
-                            <div class="event-detail">
-                                🕐 ${formatTime(event.start)}${event.end ? ' - ' + formatTime(event.end) : ''}
-                            </div>
-                            ${event.location ? `<div class="event-detail">📍 ${event.location}</div>` : ''}
-                        </div>
-                        ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
-                    </div>
-                `;
-            });
-            
-            content.innerHTML = html;
+            const upcoming = events.filter(e => e.start >= now).slice(0, 15);
+
+            content.innerHTML = upcoming.map(e => `
+        <div class="event">
+            <div class="event-title">${e.summary}</div>
+            <div class="event-details">
+                <div>📅 ${e.start.toLocaleDateString('de-DE')}</div>
+                <div>🕐 ${e.start.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div>
+                ${e.location ? `<div>📍 ${e.location}</div>` : ''}
+            </div>
+            ${e.description ? `<div class="event-description">${e.description}</div>` : ''}
+        </div>
+    `).join('');
         }
+        const SUPABASE_URL = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6';
 
         async function loadCalendar() {
-            const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading">Lade Kalender... (max 20s)</div>';
-
-            try {
-                // CORS-Proxy verwenden, um das CORS-Problem zu umgehen
-                const calendarUrl = 'https://login.schulmanager-online.de/ical/calendar/6qpzMrbSRs';
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                
-                const response = await fetch(proxyUrl + encodeURIComponent(calendarUrl));
-                
-                if (!response.ok) {
-                    throw new Error('Kalender konnte nicht geladen werden');
+            const res = await fetch(
+                `${SUPABASE_URL}/rest/v1/calendar_cache?id=eq.1&select=ics`,
+                {
+                    headers: {
+                        apikey: SUPABASE_KEY,
+                        Authorization: `Bearer ${SUPABASE_KEY}`
+                    }
                 }
-                
-                const icsText = await response.text();
-                const events = parseICS(icsText);
-                displayEvents(events);
-            } catch (error) {
-                content.innerHTML = `
-                    <div class="error">
-                        ⚠️ Fehler beim Laden des Kalenders: ${error.message}
-                        <br><br>
-                        Bitte überprüfe deine Internetverbindung und versuche es erneut.
-                    </div>
-                `;
-            }
+            );
+
+            const data = await res.json();
+            displayEvents(parseICS(data[0].ics));
         }
 
-        // Kalender beim Laden der Seite abrufen
         loadCalendar();
     </script>
 </body>
+
 </html>
