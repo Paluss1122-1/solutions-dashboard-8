@@ -39,7 +39,7 @@
             justify-content: space-between;
             left: 50%;
             transform: translate(-50%, -20%);
-            pointer-events: none; /* alles durchlassen */
+            pointer-events: none;
         }
 
         .buttons button {
@@ -252,6 +252,12 @@
 
         function updatePage() {
             const loadingOverlay = document.getElementById('loadingOverlay');
+            const imgSrc = `pictures/${currentPage}.jpg`;
+            if (imageElement.src.endsWith(imgSrc) && imageElement.complete) {
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = currentPage === totalPages;
+                return;
+            }
             loadingOverlay.style.display = 'flex';
 
             const preloadedImage = preloadedImages[currentPage];
@@ -411,7 +417,7 @@
                         zeit: new Date().toISOString(),
                         fehler: err.message || err
                     }]);
-                        console.log(err)
+                    console.log(err)
                 }
             }
         }
@@ -574,7 +580,7 @@
     <script>
         function checkAccess() {
             const username = localStorage.getItem('username');
-            if (!username) {
+            if (!username && location.hostname !== '127.0.0.1') {
                 document.body.innerHTML = `
           <div class="access-denied">
             <h1>🚫 Zugang verweigert</h1>
