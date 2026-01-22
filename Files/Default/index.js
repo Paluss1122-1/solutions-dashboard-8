@@ -530,13 +530,11 @@ function start() {
         intro.remove()
     }, 1000);
     setTimeout(() => {
-        // Warten bis die Nutzer aus Supabase geladen sind
         if (users.length === 0) {
             setTimeout(() => start(), 500);
             return;
         }
 
-        // Nutzer aus localStorage finden
         if (localStorage.getItem('username')) {
             users.forEach(function (user) {
                 if (user.username === localStorage.getItem('username')) {
