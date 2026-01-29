@@ -50,26 +50,42 @@
   </style>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { supabaseKey } from "./config.js";
 
     // Zugangskontrolle
-    function checkAccess() {
+    async function checkAccess() {
       const username = localStorage.getItem('username');
-      if (username !== 'Paluss1122') {
-        document.body.innerHTML = `
-          <div class="access-denied">
-            <h1>🚫 Zugang verweigert</h1>
-            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-          </div>
-        `;
+      const password = localStorage.getItem('password');
+      if (!username) {
+        document.body.innerHTML = `<div class="access-denied"> 
+          <h1>🚫 Zugang verweigert</h1> 
+          <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+          </div>`;
         return false;
       }
-      return true;
+      try {
+        const { data, error } =
+          await supabase.functions.invoke('isAdmin', { body: { localusername: username, password: password }, })
+        if (!data.valid) {
+          document.body.innerHTML = `<div class="access-denied"> 
+            <h1>🚫 Zugang verweigert</h1> 
+            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+            </div>`;
+          return false;
+        }
+        return true;
+      }
+      catch {
+        document.body.innerHTML =
+          `<div class="access-denied">
+            <h1>⚠️ Fehler</h1>
+            <p>Überprüfung nicht möglich.</p>
+          </div>`; return false;
+      }
     }
 
     // Supabase Config
     const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
-    const supabaseKey = "sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     let filterActive = false;
@@ -121,10 +137,13 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      if (checkAccess()) {
-        ladeAnalytics();
-      }
+      (async () => {
+        if (await checkAccess()) {
+          ladeAnalytics();
+        }
+      })();
     });
+
 
     const filterBtn = document.getElementById("filterbt");
 
@@ -137,12 +156,23 @@
 </head>
 
 <body>
+  <button id="testBtn">Variable abrufen</button>
+  <pre id="output"></pre>
   <h1>📊 Analytics-Einträge</h1>
-  <button id="filterbt" style="background-color: red; border-radius: 30px; border:none; padding: 10px 30px; left: 50%; transform: translate(-50%); position: absolute; cursor: pointer;">Filtern</button>
+  <button id="filterbt"
+    style="background-color: red; border-radius: 30px; border:none; padding: 10px 30px; left: 50%; transform: translate(-50%); position: absolute; cursor: pointer;">Filtern</button>
   <div class="stat">
     <h2>Letzte Besuche (Supabase)</h2>
     <div id="besuche"></div>
   </div>
+
+  <script>
+    document.getElementById("testBtn").addEventListener("click", async () => {
+      const res = await fetch("/./.netlify/functions/test-env");
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
 </body>
 
 </html>
