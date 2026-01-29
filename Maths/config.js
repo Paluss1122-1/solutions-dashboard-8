@@ -1,0 +1,1 @@
+export const supabaseKey = "sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6"
