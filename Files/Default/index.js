@@ -45,10 +45,10 @@ function SendAnalyticsStep(step) {
 
 function warteAufBubbleButton(versuche = 0) {
     const bubblebt = document.getElementById('chatbase-bubble-button');
-    if (!localStorage.getItem("username")) {
-        bubblebt.style.display = "none"
-    }
     if (bubblebt) {
+        if (!localStorage.getItem("username")) {
+            bubblebt.style.display = "none"
+        }
         bubblebt.style.zIndex = '0';
         bubblebt.onclick = function () {
             SendAnalyticsStep('Chatbot geöffnet')
@@ -558,7 +558,7 @@ function start() {
 
         window.founduser = founduser
         //Admin Funktionen
-        if (founduser && founduser.username && founduser.username == 'Paluss1122') {
+        if (founduser && founduser.username && founduser.username == 'Plus1122') {
             //Überschrift
             let headerlink = document.createElement('h3')
             headerlink.innerHTML = '<u>Admin</u>';
