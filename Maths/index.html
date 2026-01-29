@@ -39,7 +39,8 @@
             justify-content: space-between;
             left: 50%;
             transform: translate(-50%, -20%);
-            pointer-events: none; /* alles durchlassen */
+            pointer-events: none;
+            /* alles durchlassen */
         }
 
         .buttons button {
@@ -362,9 +363,9 @@
     </script>
     <script type="module">
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+        import { supabaseKey } from "./config.js";
 
         const supabaseUrl = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-        const supabaseKey = 'sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6';
 
         const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -411,7 +412,7 @@
                         zeit: new Date().toISOString(),
                         fehler: err.message || err
                     }]);
-                        console.log(err)
+                    console.log(err)
                 }
             }
         }
@@ -505,6 +506,20 @@
                 document.getElementById("why-ws").innerText = data.Grund;
             }
         }
+
+
+        function checkAccess() {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                document.body.innerHTML = `<div class="access-denied">
+                    <h1>🚫 Zugang verweigert</h1>
+                    <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+                    <p>Du musst angemeldet sein!</p>
+                    <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
+                </div>; return false;`
+            }
+            return true;
+        } // Zugangskontrolle beim Laden der Seite if (!checkAccess()) { throw new Error('Zugang verweigert'); }
     </script>
 </head>
 
@@ -572,26 +587,6 @@
         </button>
     </div>
     <script>
-        function checkAccess() {
-            const username = localStorage.getItem('username');
-            if (!username) {
-                document.body.innerHTML = `
-          <div class="access-denied">
-            <h1>🚫 Zugang verweigert</h1>
-            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-            <p>Du musst angemeldet sein!</p>
-            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-          </div>
-        `;
-                return false;
-            }
-            return true;
-        }
-
-        // Zugangskontrolle beim Laden der Seite
-        if (!checkAccess()) {
-            throw new Error('Zugang verweigert');
-        }
     </script>
     <script>
         const workbookImage = document.getElementById('workbookImage');
