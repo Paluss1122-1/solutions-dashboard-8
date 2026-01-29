@@ -40,7 +40,10 @@
             left: 50%;
             transform: translate(-50%, -20%);
             pointer-events: none;
+<<<<<<< HEAD
             /* alles durchlassen */
+=======
+>>>>>>> f82147d4f8f55c37acbad4ea4be07262f30092bd
         }
 
         .buttons button {
@@ -253,6 +256,12 @@
 
         function updatePage() {
             const loadingOverlay = document.getElementById('loadingOverlay');
+            const imgSrc = `pictures/${currentPage}.jpg`;
+            if (imageElement.src.endsWith(imgSrc) && imageElement.complete) {
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = currentPage === totalPages;
+                return;
+            }
             loadingOverlay.style.display = 'flex';
 
             const preloadedImage = preloadedImages[currentPage];
@@ -587,6 +596,29 @@
         </button>
     </div>
     <script>
+<<<<<<< HEAD
+=======
+        function checkAccess() {
+            const username = localStorage.getItem('username');
+            if (!username && location.hostname !== '127.0.0.1') {
+                document.body.innerHTML = `
+          <div class="access-denied">
+            <h1>🚫 Zugang verweigert</h1>
+            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+            <p>Du musst angemeldet sein!</p>
+            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
+          </div>
+        `;
+                return false;
+            }
+            return true;
+        }
+
+        // Zugangskontrolle beim Laden der Seite
+        if (!checkAccess()) {
+            throw new Error('Zugang verweigert');
+        }
+>>>>>>> f82147d4f8f55c37acbad4ea4be07262f30092bd
     </script>
     <script>
         const workbookImage = document.getElementById('workbookImage');
