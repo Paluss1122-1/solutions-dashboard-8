@@ -408,12 +408,12 @@
                     <input type="text" id="editSettingName" class="form-input" readonly>
                 </div>
 
-                                 <div class="form-group">
-                     <label class="form-label">Wert:</label>
-                     <div id="valueInputContainer">
-                         <input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">
-                     </div>
-                 </div>
+                <div class="form-group">
+                    <label class="form-label">Wert:</label>
+                    <div id="valueInputContainer">
+                        <input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">
+                    </div>
+                </div>
 
 
 
@@ -427,33 +427,49 @@
 
     <script type="module">
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
+        import { supabaseKey } from "./config.js";
         // Zugangskontrolle
-        function checkAccess() {
+        async function checkAccess() {
             const username = localStorage.getItem('username');
-            if (username !== 'Paluss1122') {
-                document.body.innerHTML = `
-                    <div class="access-denied">
-                        <h1>🚫 Zugang verweigert</h1>
-                        <p>Sie haben keine Berechtigung, diese Seite zu besuchen.</p>
-                        <p>Benötigter Benutzer: Paluss1122</p>
-                        <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-                    </div>
-                `;
+            const password = localStorage.getItem('password');
+            if (!username) {
+                document.body.innerHTML = `<div class="access-denied"> 
+          <h1>🚫 Zugang verweigert</h1> 
+          <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+          </div>`;
                 return false;
             }
-            return true;
+            try {
+                const { data, error } =
+                    await supabase.functions.invoke('isAdmin', { body: { localusername: username, password: password }, })
+                if (!data.valid) {
+                    document.body.innerHTML = `<div class="access-denied"> 
+            <h1>🚫 Zugang verweigert</h1> 
+            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+            </div>`;
+                    return false;
+                }
+                return true;
+            }
+            catch {
+                document.body.innerHTML =
+                    `<div class="access-denied">
+            <h1>⚠️ Fehler</h1>
+            <p>Überprüfung nicht möglich.</p>
+          </div>`; return false;
+            }
         }
 
-        // Zugangskontrolle beim Laden der Seite
-        if (!checkAccess()) {
-            // Stoppe die weitere Ausführung
-            throw new Error('Zugang verweigert');
-        }
+        window.addEventListener("DOMContentLoaded", () => {
+            (async () => {
+                if (await checkAccess()) {
+                    ladeEinstellungen();
+                }
+            })();
+        });
 
         // Supabase Konfiguration
         const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
-        const supabaseKey = "sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6";
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         let settings = [];
@@ -637,26 +653,26 @@
 
             currentEditSetting = setting;
 
-                         // Formular mit aktuellen Werten füllen
-             document.getElementById('editSettingName').value = setting.name;
-             
-             // Dynamisches Input-Feld basierend auf Einstellungstyp
-             const valueContainer = document.getElementById('valueInputContainer');
-             const textInput = document.getElementById('editSettingValue');
-             
-             if (setting.name === 'Wartungsarbeiten') {
-                 // Checkbox für Boolean-Werte
-                 valueContainer.innerHTML = `
+            // Formular mit aktuellen Werten füllen
+            document.getElementById('editSettingName').value = setting.name;
+
+            // Dynamisches Input-Feld basierend auf Einstellungstyp
+            const valueContainer = document.getElementById('valueInputContainer');
+            const textInput = document.getElementById('editSettingValue');
+
+            if (setting.name === 'Wartungsarbeiten') {
+                // Checkbox für Boolean-Werte
+                valueContainer.innerHTML = `
                      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                          <input type="checkbox" id="editSettingValue" ${setting.value ? 'checked' : ''} style="width: 20px; height: 20px;">
                          <span>Wartungsarbeiten aktiviert</span>
                      </label>
                  `;
-             } else {
-                 // Text-Input für andere Werte
-                 valueContainer.innerHTML = `<input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">`;
-                 document.getElementById('editSettingValue').value = setting.value;
-             }
+            } else {
+                // Text-Input für andere Werte
+                valueContainer.innerHTML = `<input type="text" id="editSettingValue" class="form-input" placeholder="Neuer Wert">`;
+                document.getElementById('editSettingValue').value = setting.value;
+            }
 
             // Modal öffnen
             document.getElementById('editModal').style.display = 'flex';
@@ -688,37 +704,37 @@
                 return;
             }
 
-                         // Wert abrufen basierend auf Input-Typ
-             let newValue;
-             if (currentEditSetting.name === 'Wartungsarbeiten') {
-                 // Checkbox-Wert
-                 newValue = document.getElementById('editSettingValue').checked;
-             } else {
-                 // Text-Input-Wert
-                 newValue = document.getElementById('editSettingValue').value;
-             }
+            // Wert abrufen basierend auf Input-Typ
+            let newValue;
+            if (currentEditSetting.name === 'Wartungsarbeiten') {
+                // Checkbox-Wert
+                newValue = document.getElementById('editSettingValue').checked;
+            } else {
+                // Text-Input-Wert
+                newValue = document.getElementById('editSettingValue').value;
+            }
 
-             // Wert validieren basierend auf Typ
-             let validatedValue = newValue;
-             try {
-                 switch (currentEditSetting.type) {
-                     case 'number':
-                         validatedValue = parseFloat(newValue);
-                         if (isNaN(validatedValue)) {
-                             throw new Error('Ungültige Zahl');
-                         }
-                         break;
-                     case 'boolean':
-                         validatedValue = newValue; // Bereits Boolean von Checkbox
-                         break;
-                     case 'json':
-                         validatedValue = JSON.parse(newValue);
-                         break;
-                 }
-             } catch (error) {
-                 zeigeNachricht(`Fehler bei der Validierung: ${error.message}`, 'error');
-                 return;
-             }
+            // Wert validieren basierend auf Typ
+            let validatedValue = newValue;
+            try {
+                switch (currentEditSetting.type) {
+                    case 'number':
+                        validatedValue = parseFloat(newValue);
+                        if (isNaN(validatedValue)) {
+                            throw new Error('Ungültige Zahl');
+                        }
+                        break;
+                    case 'boolean':
+                        validatedValue = newValue; // Bereits Boolean von Checkbox
+                        break;
+                    case 'json':
+                        validatedValue = JSON.parse(newValue);
+                        break;
+                }
+            } catch (error) {
+                zeigeNachricht(`Fehler bei der Validierung: ${error.message}`, 'error');
+                return;
+            }
 
             const updatedSetting = {
                 ...currentEditSetting,
@@ -785,9 +801,6 @@
                 closeModal();
             }
         });
-
-        // Initial laden
-        window.addEventListener('DOMContentLoaded', ladeEinstellungen);
     </script>
 </body>
 
