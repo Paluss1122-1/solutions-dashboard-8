@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { nutzerdatenAendern } from "./netlify/functions/change-credentials"
+import { SUPABASE_KEY } from "./netlify/functions/get-sb-credentials"
 
 // Supabase-Initialisierung für Netlify
 // Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
@@ -77,7 +79,7 @@ setTimeout(() => {
 }, 2000);
 
 
-async function nutzerdatenAendern(username, neueDaten) {
+/*async function nutzerdatenAendern(username, neueDaten) {
     try {
         // Nutzer in Supabase updaten
         const { data, error } = await supabase
@@ -107,7 +109,7 @@ async function nutzerdatenAendern(username, neueDaten) {
     } catch (err) {
         return false;
     }
-}
+}*/
 
 // Funktion global verfügbar machen
 window.nutzerdatenAendern = nutzerdatenAendern;
