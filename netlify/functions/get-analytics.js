@@ -1,42 +1,62 @@
 export async function handler(event) {
   try {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
+    const { username, password } = JSON.parse(event.body || "{}");
 
-    if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+    if (!username || !password) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Server falsch konfiguriert" })
+        statusCode: 401,
+        body: JSON.stringify({ error: "Unauthorized" })
       };
     }
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/analytics?order=datum.desc`, {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // 1️⃣ Admin-Check (Supabase Edge Function)
+    const adminRes = await fetch(`${SUPABASE_URL}/functions/v1/isAdmin`, {
+      method: "POST",
       headers: {
-        apikey: SERVICE_ROLE_KEY,
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify({
+        localusername: username,
+        password: password
+      })
     });
 
-    if (!res.ok) {
-      const text = await res.text();
+    const adminData = await adminRes.json();
+
+    if (!adminData?.valid) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: text })
+        statusCode: 403,
+        body: JSON.stringify({ error: "Access denied" })
       };
     }
 
-    const data = await res.json();
+    // 2️⃣ Analytics abrufen
+    const analyticsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/analytics?order=datum.desc`,
+      {
+        headers: {
+          apikey: SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const analytics = await analyticsRes.json();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify(analytics)
     };
 
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: "Serverfehler" })
     };
   }
 }
