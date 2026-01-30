@@ -521,6 +521,7 @@
             Object.values(categories).forEach(container => {
                 container.innerHTML = '';
             });
+            document.getElementById("loading").style.display = "none"
 
             if (einstellungenListe.length === 0) {
                 Object.values(categories).forEach(container => {
