@@ -96,11 +96,7 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      (async () => {
-        if (await checkAccess()) {
-          ladeAnalytics();
-        }
-      })();
+      ladeAnalytics();
     });
 
 
