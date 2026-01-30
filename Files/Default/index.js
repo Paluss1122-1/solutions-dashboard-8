@@ -528,13 +528,14 @@ function start() {
     intro.style.opacity = '0'
     update()
     setTimeout(() => {
-        intro.remove()
-    }, 1000);
-    setTimeout(() => {
-        if (!generalData ||window.generalData.length === 0) {
+        if (!generalData && window.generalData.length === 0) {
             setTimeout(() => start(), 500);
             return;
         }
+
+        setTimeout(() => {
+            intro.remove()
+        }, 1000);
 
         if (localStorage.getItem('username')) {
             fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(username)}`)
