@@ -84,55 +84,37 @@
       }
     }
 
-    // Supabase Config
-    const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    let filterActive = false;
-
     async function ladeAnalytics() {
       const container = document.getElementById("besuche");
-      container.innerHTML = "<p>Lade Analytics-Daten...</p>";
+      container.innerHTML = "Lade Analytics-Daten...";
 
       try {
-        const { data, error } = await supabase
-          .from("analytics")
-          .select("*")
-          .order("datum", { ascending: false }); // ACHTUNG: Spaltenname prüfen!
+        const res = await fetch("/.netlify/functions/get-analytics");
+        const data = await res.json();
 
-        if (error) {
-          console.error("Supabase Fehler:", error);
-          container.innerHTML = `<p>Fehler beim Laden: ${error.message}</p>`;
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          container.innerHTML = "<p>Keine Analytics-Einträge gefunden.</p>";
+        if (!Array.isArray(data)) {
+          container.innerHTML = "Fehler beim Laden";
           return;
         }
 
         container.innerHTML = "";
         data.forEach(entry => {
-          if (filterActive && entry.username === "Paluss1122") {
-            return;
-          }
           const div = document.createElement("div");
           div.className = "visit-entry";
           div.innerHTML = `
-            <p><strong>ID:</strong> ${entry.id || "-"}</p>
-            <p>🕓 Zeit: ${entry.zeit || entry.datum || "-"}</p>
-            <p>🧭 Browser: ${entry.browser || "-"}</p>
-            <p>📱 Gerät: ${entry.device || "-"}</p>
-            <p>🌐 Website: ${entry.link || "-"}</p>
-            <p>👤 Person: ${entry.username || "-"}</p>
-            <p>⚡ Aktion: ${entry.action || entry.Action || "-"}</p>
-          `;
+        <p><strong>ID:</strong> ${entry.id}</p>
+        <p>🕓 Zeit: ${entry.zeit || entry.datum}</p>
+        <p>🧭 Browser: ${entry.browser}</p>
+        <p>📱 Gerät: ${entry.device}</p>
+        <p>🌐 Website: ${entry.link}</p>
+        <p>👤 Person: ${entry.username}</p>
+        <p>⚡ Aktion: ${entry.action}</p>
+      `;
           container.appendChild(div);
         });
 
       } catch (e) {
-        console.error("JS Fehler:", e);
-        container.innerHTML = `<p>Fehler beim Laden der Daten: ${e.message}</p>`;
+        container.innerHTML = "Serverfehler";
       }
     }
 
