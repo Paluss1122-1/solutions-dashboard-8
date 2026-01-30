@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { nutzerdatenAendern } from "./netlify/functions/change-credentials"
-import { SUPABASE_KEY } from "./netlify/functions/get-sb-credentials"
+import { nutzerdatenAendern } from "./././netlify/functions/change-credentials"
+import { SUPABASE_KEY } from "./././netlify/functions/get-sb-credentials"
 
 // Supabase-Initialisierung für Netlify
 // Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
