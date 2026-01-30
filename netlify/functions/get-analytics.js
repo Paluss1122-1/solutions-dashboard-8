@@ -10,7 +10,7 @@ export async function handler(event) {
     }
 
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
 
     // 1️⃣ Admin-Check (Supabase Edge Function)
     const adminRes = await fetch(`${SUPABASE_URL}/functions/v1/isAdmin`, {
