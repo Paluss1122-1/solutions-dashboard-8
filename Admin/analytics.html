@@ -89,7 +89,7 @@
       container.innerHTML = "Lade Analytics-Daten...";
 
       try {
-        const res = await fetch("/.netlify/functions/get-analytics");
+        const res = await fetch("/./.netlify/functions/get-analytics");
         const data = await res.json();
 
         if (!Array.isArray(data)) {
