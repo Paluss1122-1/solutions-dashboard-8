@@ -1,35 +1,59 @@
-// Proxy-Funktion, ruft Supabase Edge Function auf
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+export async function handler(event) {
+    try {
+        let body = {};
+        try {
+            body = JSON.parse(event.body || "{}");
+        } catch {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Invalid JSON" }),
+            };
+        }
 
-const SUPABASE_URL = "https://empsgwnjxxhzyudvxyxg.supabase.co/functions/v1/user-management";
-const SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
+        const { username, password, updateUser, neueDaten } = body;
 
-serve(async (req) => {
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
-  }
+        if (!username || !password) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: "Unauthorized" }),
+            };
+        }
 
-  try {
-    const body = await req.json();
+        // Supabase Edge Function aufrufen
+        const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/user-management`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username,
+                password,
+                updateUser,
+                neueDaten
+            }),
+        });
 
-    const res = await fetch(SUPABASE_EDGE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY ?? ""}`,
-      },
-      body: JSON.stringify(body),
-    });
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            return { statusCode: res.status, body: JSON.stringify({ error: errData.error || "Access denied" }) };
+        }
 
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
-      status: res.status,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: "Server Error", details: err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-});
+        const data = await res.json();
+
+        return {
+            statusCode: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store",
+                "X-Content-Type-Options": "nosniff",
+            },
+            body: JSON.stringify(data),
+        };
+    } catch {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Serverfehler BACKEND" }),
+        };
+    }
+}
