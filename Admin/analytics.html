@@ -59,7 +59,7 @@
       const password = localStorage.getItem("password");
 
       try {
-        const res = await fetch("/./.netlify/functions/get-analytics", {
+        const res = await fetch("/./.netlify/functions/get-analytics.js", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password })
