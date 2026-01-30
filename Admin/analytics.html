@@ -82,9 +82,12 @@
           div.className = "visit-entry";
           div.innerHTML = `
         <p><strong>ID:</strong> ${entry.id}</p>
-        <p>🕓 Zeit: ${entry.zeit || entry.datum}</p>
-        <p>👤 Person: ${entry.username}</p>
-        <p>⚡ Aktion: ${entry.action}</p>
+        <p>Zeit: ${entry.datum}</p>
+        <p>Person: ${entry.username}</p>
+        <p>Aktion: ${entry.Action}</p>
+        <p>Gerät: ${entry.device}</p>
+        <p>Browser: ${entry.browser}</p>
+        <p>Link: ${entry.link}</p>
       `;
           container.appendChild(div);
         });
