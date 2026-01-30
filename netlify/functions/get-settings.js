@@ -25,10 +25,13 @@ export async function handler(event) {
                     Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ 
-                localusername: username,
-                password: password,
-action,key, value }),
+                body: JSON.stringify({
+                    localusername: username,
+                    password: password,
+                    action,
+                    key,
+                    value
+                }),
             });
 
             if (!res.ok) {
