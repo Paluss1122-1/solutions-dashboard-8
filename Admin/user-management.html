@@ -410,40 +410,12 @@ Website: solutiosn-dashboard-8.netlify.app`;
   </div>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    // Zugangskontrolle
-    function checkAccess() {
-      const username = localStorage.getItem('username');
-      if (username !== 'Paluss1122') {
-        document.body.innerHTML = `
-          <div class="access-denied">
-            <h1>🚫 Zugang verweigert</h1>
-            <p>Sie haben keine Berechtigung, diese Seite zu besuchen.</p>
-            <p>Benötigter Benutzer: Paluss1122</p>
-            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-          </div>
-        `;
-        return false;
-      }
-      return true;
-    }
-
-    // Zugangskontrolle beim Laden der Seite
-    if (!checkAccess()) {
-      // Stoppe die weitere Ausführung
-      throw new Error('Zugang verweigert');
-    }
-
-    // Supabase Konfiguration
-    const supabaseUrl = "https://empsgwnjxxhzyudvxyxg.supabase.co";
-    const supabaseKey = "sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6";
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const NETLIFY_API = "/.netlify/functions/get-analytics";
 
     let users = [];
     let currentEditUser = null;
 
-    // Funktion zum Laden der Nutzer
+    // Funktion zum Laden der Nutzer über Netlify Function
     async function ladeNutzer() {
       const loadingDiv = document.getElementById('loading');
       const userListDiv = document.getElementById('userList');
@@ -453,18 +425,31 @@ Website: solutiosn-dashboard-8.netlify.app`;
       userListDiv.innerHTML = '';
       messageDiv.innerHTML = '';
 
+      // Zugangsdaten vom localStorage holen
+      const username = localStorage.getItem('username');
+      const password = localStorage.getItem('password');
+
+      if (!username || !password) {
+        userListDiv.innerHTML = '<p style="color:red; text-align:center;">Nicht angemeldet!</p>';
+        loadingDiv.style.display = 'none';
+        return;
+      }
 
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('username, password, displayname, allowedcookies, bgcolor');
+        const res = await fetch(NETLIFY_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
 
-        if (error) {
-          throw new Error(`Fehler beim Laden der Nutzer: ${error.message}`);
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Fehler beim Laden der Nutzer');
         }
 
-        users = data || [];
-        window.users = data
+        const data = await res.json();
+        users = data; // Daten in globale Variable
+        window.users = users;
         zeigeNutzer(users);
 
       } catch (error) {
@@ -583,32 +568,29 @@ Website: solutiosn-dashboard-8.netlify.app`;
         return;
       }
 
-      // Cookies-Wert verarbeiten
       const cookiesValue = document.getElementById('editAllowedcookies').value;
-      let allowedcookies = null;
-      if (cookiesValue === 'true') {
-        allowedcookies = true;
-      } else if (cookiesValue === 'false') {
-        allowedcookies = false;
-      } else {
-        allowedcookies = null;
-      }
+      let allowedcookies = cookiesValue === 'true' ? true : cookiesValue === 'false' ? false : null;
 
       const neueDaten = {
         password: document.getElementById('editPassword').value.trim() || null,
         displayname: document.getElementById('editDisplayname').value.trim() || null,
-        allowedcookies: allowedcookies,
+        allowedcookies,
         bgcolor: document.getElementById('editBgcolor').value.trim() || null
       };
 
       try {
-        const { error } = await supabase
-          .from('users')
-          .update(neueDaten)
-          .eq('username', currentEditUser.username);
+        const username = localStorage.getItem('username');
+        const password = localStorage.getItem('password');
 
-        if (error) {
-          throw new Error(`Fehler beim Aktualisieren: ${error.message}`);
+        const res = await fetch(NETLIFY_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, updateUser: currentEditUser.username, neueDaten })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Fehler beim Speichern');
         }
 
         // Lokale Daten aktualisieren
@@ -622,10 +604,9 @@ Website: solutiosn-dashboard-8.netlify.app`;
         zeigeNutzer(users);
 
       } catch (error) {
-        zeigeNachricht(`Fehler beim Speichern: ${error.message}`, 'error');
+        zeigeNachricht(`Fehler: ${error.message}`, 'error');
       }
     });
-
 
     // Modal schließen beim Klick außerhalb
     window.onclick = function (event) {
