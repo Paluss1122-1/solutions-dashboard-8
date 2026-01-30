@@ -448,7 +448,7 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            const res = await fetch("/.netlify/functions/getSettings", {
+            const res = await fetch("/.netlify/functions/get-Settings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
