@@ -427,8 +427,7 @@
 
     <script type="module">
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-        import { supabaseKey } from "./config.js";
-        
+
         async function checkAccess() {
             const username = localStorage.getItem('username');
             const password = localStorage.getItem('password');
@@ -486,50 +485,41 @@
         };
 
         // Funktion zum Laden der Einstellungen
-        window.ladeEinstellungen = async function () {
-            const loadingDiv = document.getElementById('loading');
-            const messageDiv = document.getElementById('message');
+        // frontend – ersetzt checkAccess + ladeEinstellungen
+        async function ladeEinstellungen() {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
 
-            loadingDiv.style.display = 'block';
-            messageDiv.innerHTML = '';
+            const res = await fetch("/.netlify/functions/getSettings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
 
-            try {
-                // Lade allgemeine Einstellungen aus der general Tabelle
-                const { data: generalData, error: generalError } = await supabase
-                    .from('general')
-                    .select('*');
-
-                let allSettings = flattenSettings(defaultSettings);
-
-                // Allgemeine Einstellungen verarbeiten
-                if (!generalError && generalData && generalData.length > 0) {
-                    const generalSettings = generalData[0]; // Nehme den ersten Eintrag
-                    allSettings = allSettings.map(setting => {
-                        if (setting.category === 'general') {
-                            // Verwende den Einstellungsnamen direkt als Schlüssel
-                            if (generalSettings[setting.name] !== undefined) {
-                                return {
-                                    ...setting,
-                                    value: generalSettings[setting.name],
-                                    type: typeof generalSettings[setting.name]
-                                };
-                            }
-                        }
-                        return setting;
-                    });
-                }
-
-                settings = allSettings;
-                zeigeEinstellungen(settings);
-
-            } catch (error) {
-                zeigeNachricht(`Fehler beim Laden der Einstellungen: ${error.message}`, 'error');
-                // Fallback zu Standardeinstellungen
-                settings = flattenSettings(defaultSettings);
-                zeigeEinstellungen(settings);
-            } finally {
-                loadingDiv.style.display = 'none';
+            if (!res.ok) {
+                document.body.innerHTML = `
+      <div class="access-denied">
+        <h1>🚫 Zugang verweigert</h1>
+        <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
+      </div>`;
+                return;
             }
+
+            const data = await res.json();
+
+            const merged = flattenSettings(defaultSettings).map((s) => {
+                if (data.general && data.general[s.name] !== undefined) {
+                    return {
+                        ...s,
+                        value: data.general[s.name],
+                        type: typeof data.general[s.name],
+                    };
+                }
+                return s;
+            });
+
+            settings = merged;
+            zeigeEinstellungen(settings);
         }
 
         // Funktion zum Abflachen der Einstellungen
@@ -616,7 +606,6 @@
             });
         }
 
-        // Funktion zum Formatieren der Einstellungswerte
         function formatSettingValue(value, type) {
             if (value === null || value === undefined) {
                 return '<em>nicht gesetzt</em>';
@@ -643,7 +632,6 @@
             }
         }
 
-        // Funktion zum Bearbeiten einer Einstellung
         window.bearbeiteEinstellung = function (settingName) {
             const setting = settings.find(s => s.name === settingName);
             if (!setting) {
