@@ -25,7 +25,7 @@ export async function handler(event) {
                     Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ key, value }),
+                body: JSON.stringify({ action,key, value }),
             });
 
             if (!res.ok) {
