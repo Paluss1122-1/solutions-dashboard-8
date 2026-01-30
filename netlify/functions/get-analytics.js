@@ -24,7 +24,7 @@ export async function handler(event) {
     const limit = 50;
     const page = Number(event.queryStringParameters?.page || 0);
 
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/isAdmin`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/getAnalytics`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
