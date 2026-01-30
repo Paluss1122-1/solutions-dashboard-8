@@ -5,7 +5,6 @@ import { SUPABASE_KEY } from "./netlify/functions/get-sb-credentials"
 // Supabase-Initialisierung für Netlify
 // Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
 const SUPABASE_URL = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_URL;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Nutzer aus Supabase laden
 let users = [];
