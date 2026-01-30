@@ -1,54 +1,42 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { nutzerdatenAendern } from "/netlify/functions/change-credentials"
-import { SUPABASE_KEY } from "/netlify/functions/get-sb-credentials"
-
-// Supabase-Initialisierung für Netlify
-// Die Umgebungsvariablen werden über das Script-Tag in der HTML-Datei verfügbar gemacht
-const SUPABASE_URL = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-// Nutzer aus Supabase laden
+// Nutzer-Array
 let users = [];
 
+// Nutzer von Netlify Function laden
 async function ladeUsers() {
-    if (!supabase) {
-        console.error('Supabase-Client ist nicht verfügbar');
-        return;
-    }
-
     try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('username, password, displayname, allowedcookies, bgcolor');
-
-        if (error) {
-            console.error('Fehler beim Laden der Nutzer:', error.message);
-            const problem = document.getElementById('problem')
+        const response = await fetch('/.netlify/functions/get-users');
+        
+        if (!response.ok) {
+            console.error('Fehler beim Laden der Nutzer');
+            const problem = document.getElementById('problem');
             problem.style.display = 'block';
+            
+            // Prüfe Internetverbindung
             fetch("https://jsonplaceholder.typicode.com/posts")
-                .then(response => {
-                    if (!response.ok) {
+                .then(res => {
+                    if (!res.ok) {
                         problem.innerText = "Server konnte nicht erreicht werden.";
                     }
-                    return response.json();
+                    return res.json();
                 })
-                .then(data => {
-                    problem.innerText =
-                        "An deinem Internet liegt es nicht... Es wird nach weiteren möglichen Ursachen für das Problem gesucht.";
-                    const ls = localStorage
+                .then(() => {
+                    problem.innerText = "An deinem Internet liegt es nicht... Es wird nach weiteren möglichen Ursachen für das Problem gesucht.";
+                    
+                    const ls = localStorage;
                     if (!ls.getItem('username')) {
-                        problem.innerText = "Du bist Abgemeldet!"
+                        problem.innerText = "Du bist Abgemeldet!";
                         localStorage.clear();
                         setTimeout(() => {
-                            window.location.reload()
+                            window.location.reload();
                         }, 1000);
                     } else if (!ls.getItem('password')) {
-                        problem.innerText = "Du bist Abgemeldet!"
+                        problem.innerText = "Du bist Abgemeldet!";
                         localStorage.clear();
                         setTimeout(() => {
-                            window.location.reload()
+                            window.location.reload();
                         }, 1000);
-                    } else if (users = []) {
-                        problem.innerText = 'Es gibt aktuell Problem mit den Servern!'
+                    } else if (users.length === 0) {
+                        problem.innerText = 'Es gibt aktuell Probleme mit den Servern!';
                     }
                 })
                 .catch(error => {
@@ -57,13 +45,14 @@ async function ladeUsers() {
                         error.message.includes("NetworkError") ||
                         error.message.includes("Load failed")
                     ) {
-                        problem.innerText =
-                            "Du hast keine Internetverbindung! Stelle eine Verbindung her und lade die Website neu!";
+                        problem.innerText = "Du hast keine Internetverbindung! Stelle eine Verbindung her und lade die Website neu!";
                     }
                 });
+            return;
         }
 
-        users = data || [];
+        const data = await response.json();
+        users = data.users || [];
         window.users = users;
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
@@ -72,24 +61,29 @@ async function ladeUsers() {
 
 // Lade die Nutzer beim Start
 ladeUsers();
-// Fallback: Wenn nach 5 Sekunden keine Nutzer geladen sind, trotzdem starten
+
+// Fallback: Wenn nach 2 Sekunden keine Nutzer geladen sind, trotzdem starten
 setTimeout(() => {
     start();
 }, 2000);
 
-
-/*async function nutzerdatenAendern(username, neueDaten) {
+// Nutzerdaten ändern über Netlify Function
+async function nutzerdatenAendern(username, neueDaten) {
     try {
-        // Nutzer in Supabase updaten
-        const { data, error } = await supabase
-            .from('users')
-            .update(neueDaten)
-            .eq('username', username);
+        const response = await fetch('/.netlify/functions/update-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, neueDaten })
+        });
 
-        if (error) {
-            console.error('Fehler beim Aktualisieren der Nutzerdaten:', error.message);
+        if (!response.ok) {
+            console.error('Fehler beim Aktualisieren der Nutzerdaten');
             return false;
         }
+
+        const result = await response.json();
 
         // Auch im lokalen users-Array aktualisieren
         users = users.map(user => {
@@ -100,29 +94,32 @@ setTimeout(() => {
         });
 
         // Wenn der aktuell eingeloggte Nutzer geändert wurde, founduser aktualisieren
-        if (founduser && founduser.username === username) {
-            founduser = { ...founduser, ...neueDaten };
+        if (window.founduser && window.founduser.username === username) {
+            window.founduser = { ...window.founduser, ...neueDaten };
         }
 
         return true;
     } catch (err) {
+        console.error('Fehler:', err);
         return false;
     }
-}*/
+}
 
 // Funktion global verfügbar machen
 window.nutzerdatenAendern = nutzerdatenAendern;
 
+// Fehler melden über Netlify Function
 async function reporterror(errorMessage) {
     try {
-        const { error } = await supabase.from('Fehlerberichte').insert([{
-            userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-            zeit: new Date().toISOString(),
-            fehler: errorMessage
-        }]);
-        if (error) {
-            console.error('Fehler beim Senden des Fehlerberichts:', error.message);
-        }
+        const userAgent = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
+        
+        await fetch('/.netlify/functions/report-error', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ errorMessage, userAgent })
+        });
     } catch (err) {
         console.error('Unerwarteter Fehler beim Senden des Fehlerberichts:', err);
     }
@@ -130,7 +127,7 @@ async function reporterror(errorMessage) {
 
 window.reporterror = reporterror;
 
-// Hilfsfunktionen für Browser-Erkennung
+// Browser-Erkennung
 function getBrowserName() {
     const userAgent = navigator.userAgent;
 
@@ -144,9 +141,10 @@ function getBrowserName() {
     return 'Unknown';
 }
 
+// Analytics über Netlify Function senden
 window.SendAnalyticsStep = async function (action) {
     let user = null;
-    if (founduser || localStorage.getItem('username')) {
+    if (window.founduser || localStorage.getItem('username')) {
         try {
             user = localStorage.getItem('username');
         } catch (e) {
@@ -157,54 +155,49 @@ window.SendAnalyticsStep = async function (action) {
 
     // Prüfe, ob die Seite nicht lokal läuft
     const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+    
     if (!isLocal) {
         try {
-            const { error } = await supabase.from('analytics').insert([{
-                browser: getBrowserName(),
-                device: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                datum: new Date().toISOString(),
-                link: window.location.href,
-                username: user,
-                Action: action
-            }]);
-            if (error) {
-                await supabase.from('Fehlerberichte').insert([{
-                    userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                    zeit: new Date().toISOString(),
-                    fehler: error.message || error
-                }]);
-            }
+            await fetch('/.netlify/functions/send-analytics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    browser: getBrowserName(),
+                    device: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
+                    link: window.location.href,
+                    username: user,
+                    action: action
+                })
+            });
         } catch (err) {
-            await supabase.from('Fehlerberichte').insert([{
-                userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                zeit: new Date().toISOString(),
-                fehler: err.message || err
-            }]);
+            console.error('Fehler beim Senden der Analytics:', err);
         }
     }
 }
 
+// General-Daten laden und Update-Logik
 async function update() {
     try {
-        const { data, error } = await supabase
-            .from('general')
-            .select('*')
-            .single();
-
-        if (error) {
-            console.error('Fehler beim Laden der allgemeinen Daten:', error.message);
+        const response = await fetch('/.netlify/functions/get-general');
+        
+        if (!response.ok) {
+            console.error('Fehler beim Laden der allgemeinen Daten');
             return;
         }
 
+        const data = await response.json();
         window.generalData = data;
         window.released = data.released;
-        if (!data.released === false) {
+
+        if (data.released !== false) {
             let showMaintenance = false;
             const active = data && data.Wartungsarbeiten;
 
-            if (founduser) {
+            if (window.founduser) {
                 try {
-                    if (founduser.username === "Paluss1122" && active) {
+                    if (window.founduser.username === "Paluss1122" && active) {
                         showMaintenance = false;
                         document.title = 'Dashboard';
                     } else {
@@ -235,7 +228,7 @@ async function update() {
                     maintenanceFrame.style.display = 'flex';
                     maintenanceFrame.style.opacity = '1';
                 } else {
-                    maintenanceFrame.style.opacity = '1';
+                    maintenanceFrame.style.opacity = '0';
                     setTimeout(() => {
                         maintenanceFrame.style.display = 'none';
                     }, 1000);
@@ -259,7 +252,9 @@ async function update() {
             startCountdown();
         } else {
             const countdown = document.getElementById('countdown');
-            countdown.remove()
+            if (countdown) {
+                countdown.remove();
+            }
         }
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
