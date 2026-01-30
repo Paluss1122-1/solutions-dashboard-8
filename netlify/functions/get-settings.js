@@ -7,7 +7,7 @@ export async function handler(event) {
       return { statusCode: 400, body: JSON.stringify({ error: "Bad request" }) };
     }
 
-    const { username, password } = body;
+    const { username, password, action, key, value } = body;
     if (!username || !password) {
       return { statusCode: 401, body: JSON.stringify({ error: "Unauthorized" }) };
     }
@@ -15,20 +15,23 @@ export async function handler(event) {
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
 
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/getSettings`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/settings`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ localusername: username, password: password }),
+      body: JSON.stringify({
+        localusername: username,
+        password,
+        action,   // "load" | "save"
+        key,
+        value,
+      }),
     });
 
     if (!res.ok) {
-      return {
-        statusCode: res.status,
-        body: JSON.stringify({ error: "Access denied" }),
-      };
+      return { statusCode: res.status, body: JSON.stringify({ error: "Access denied" }) };
     }
 
     const data = await res.json();

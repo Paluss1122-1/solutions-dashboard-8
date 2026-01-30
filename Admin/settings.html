@@ -514,7 +514,6 @@
             return descriptions[key] || `Einstellung für ${key}`;
         }
 
-        // Funktion zum Anzeigen der Einstellungen
         function zeigeEinstellungen(einstellungenListe) {
             const categories = {
                 general: document.getElementById('generalSettings')
@@ -649,92 +648,37 @@
         document.getElementById('editForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            if (!currentEditSetting) {
-                zeigeNachricht('Keine Einstellung zum Bearbeiten ausgewählt!', 'error');
-                return;
-            }
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
 
-            // Wert abrufen basierend auf Input-Typ
             let newValue;
             if (currentEditSetting.name === 'Wartungsarbeiten') {
-                // Checkbox-Wert
                 newValue = document.getElementById('editSettingValue').checked;
             } else {
-                // Text-Input-Wert
                 newValue = document.getElementById('editSettingValue').value;
             }
 
-            // Wert validieren basierend auf Typ
-            let validatedValue = newValue;
-            try {
-                switch (currentEditSetting.type) {
-                    case 'number':
-                        validatedValue = parseFloat(newValue);
-                        if (isNaN(validatedValue)) {
-                            throw new Error('Ungültige Zahl');
-                        }
-                        break;
-                    case 'boolean':
-                        validatedValue = newValue; // Bereits Boolean von Checkbox
-                        break;
-                    case 'json':
-                        validatedValue = JSON.parse(newValue);
-                        break;
-                }
-            } catch (error) {
-                zeigeNachricht(`Fehler bei der Validierung: ${error.message}`, 'error');
+            const res = await fetch("/.netlify/functions/get-settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    action: "save",
+                    key: currentEditSetting.name,
+                    value: newValue,
+                }),
+            });
+
+            if (!res.ok) {
+                zeigeNachricht("Speichern fehlgeschlagen", "error");
                 return;
             }
 
-            const updatedSetting = {
-                ...currentEditSetting,
-                value: validatedValue
-            };
-
-            try {
-                // Speichere in der general Tabelle
-                const key = updatedSetting.name; // Verwende den Einstellungsnamen direkt
-
-                // Prüfe ob bereits ein Eintrag in der general Tabelle existiert
-                const { data: existingData } = await supabase
-                    .from('general')
-                    .select('*')
-                    .limit(1);
-
-                if (existingData && existingData.length > 0) {
-                    // Update bestehenden Eintrag
-                    const { error } = await supabase
-                        .from('general')
-                        .update({ [key]: updatedSetting.value })
-                        .eq('id', existingData[0].id);
-
-                    if (error) {
-                        throw new Error(`Fehler beim Speichern in general Tabelle: ${error.message}`);
-                    }
-                } else {
-                    // Erstelle neuen Eintrag
-                    const { error } = await supabase
-                        .from('general')
-                        .insert({ [key]: updatedSetting.value });
-
-                    if (error) {
-                        throw new Error(`Fehler beim Erstellen in general Tabelle: ${error.message}`);
-                    }
-                }
-
-                // Lokale Daten aktualisieren
-                const settingIndex = settings.findIndex(s => s.name === currentEditSetting.name);
-                if (settingIndex !== -1) {
-                    settings[settingIndex] = updatedSetting;
-                }
-
-                zeigeNachricht('Einstellung erfolgreich aktualisiert!', 'success');
-                closeModal();
-                zeigeEinstellungen(settings);
-
-            } catch (error) {
-                zeigeNachricht(`Fehler beim Speichern: ${error.message}`, 'error');
-            }
+            currentEditSetting.value = newValue;
+            zeigeNachricht("Einstellung gespeichert", "success");
+            closeModal();
+            zeigeEinstellungen(settings);
         });
 
         // Modal schließen beim Klick außerhalb
