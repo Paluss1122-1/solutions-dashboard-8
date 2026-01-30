@@ -15,7 +15,7 @@ export async function handler(event) {
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
 
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/getsettings`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/getSettings`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
