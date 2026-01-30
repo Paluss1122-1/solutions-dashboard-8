@@ -530,378 +530,391 @@ function start() {
         intro.remove()
     }, 1000);
     setTimeout(() => {
-        if (users.length === 0) {
+        if (window.generalData.length === 0) {
             setTimeout(() => start(), 500);
             return;
         }
 
         if (localStorage.getItem('username')) {
-            users.forEach(function (user) {
-                if (user.username === localStorage.getItem('username')) {
-                    founduser = user;
-                }
-            });
+            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(username)}`)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (result) {
+                    if (result.user) {
+                        founduser = result.user;
+                        console.log('User gefunden:', founduser);
+                        if (localStorage.getItem('password') && !localStorage.getItem('username')) {
+                            if (!localStorage.getItem('errorhappened')) {
+                                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername!');
+                                alert('Es ist etwas Seltsames passiert! Bitte Lade die Seite neu!')
+                                localStorage.setItem('errorhappened', true)
+                                throw new Error('Annything strange Happened! Please refresh!')
+                            } else {
+                                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername, alles wird zurückgesetzt!');
+                                localStorage.clear();
+                                window.location.reload();
+                            }
+                        }
+
+                        window.founduser = founduser
+                        if (founduser && founduser.username && founduser.username == 'Plus1122') {
+                            //Überschrift
+                            let headerlink = document.createElement('h3')
+                            headerlink.innerHTML = '<u>Admin</u>';
+                            linkcontainer.appendChild(headerlink);
+                            //Analytics
+                            let newlink1 = document.createElement('a');
+                            newlink1.setAttribute('href', 'Admin/analytics.html');
+                            newlink1.innerHTML = '<span>Analytics</span>'
+                            linkcontainer.appendChild(newlink1);
+                            //Nutzer Verwaltung
+                            let newlink2 = document.createElement('a');
+                            newlink2.setAttribute('href', 'Admin/user-management.html');
+                            newlink2.innerHTML = '<span>Nutzer Verwaltung</span>'
+                            linkcontainer.appendChild(newlink2);
+                            //Einstellungen
+                            let newlink3 = document.createElement('a');
+                            newlink3.setAttribute('href', 'Admin/settings.html');
+                            newlink3.innerHTML = '<span>Einstellungen</span>'
+                            linkcontainer.appendChild(newlink3);
+                            SendAnalyticsStep('Admin Funktionen hinzugefügt');
+                        }
+
+                        if (localStorage.getItem('allowedcookies') && founduser && !founduser.allowedcookies) {
+                            window.nutzerdatenAendern(founduser.username, { 'allowedcookies': localStorage.getItem('allowedcookies') })
+                            SendAnalyticsStep('allowedcookies aus localStorage in Supabase synchronisiert');
+                        }
+
+                        // Mobile Anpassung
+                        if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                            if (loginContainer) {
+                                loginContainer.style.width = '80%';
+                                SendAnalyticsStep('Mobile erkannt, Login Container angepasst');
+                            }
+                        }
+
+                        // bg-color aus Supabase in localStorage synchronisieren
+                        if (founduser && founduser.bgcolor && !localStorage.getItem('bg-color')) {
+                            localStorage.setItem('bg-color', founduser.bgcolor);
+                            SendAnalyticsStep('bg-color aus Supabase in localStorage synchronisiert');
+                        }
+                        // displayname aus Supabase in localStorage synchronisieren
+                        if (founduser && founduser.displayname && !localStorage.getItem('displayname')) {
+                            localStorage.setItem('displayname', founduser.displayname);
+                            SendAnalyticsStep('displayname aus Supabase in localStorage synchronisiert');
+                        }
+
+                        // allowedcookies aus Supabase in localStorage synchronisieren
+                        if (founduser && founduser.allowedcookies && !localStorage.getItem('allowedcookies')) {
+                            localStorage.setItem('allowedcookies', 'true');
+                            SendAnalyticsStep('allowedcookies aus Supabase in localStorage synchronisiert');
+                        }
+
+                        // bg-color aus localStorage in Supabase synchronisieren (falls nicht vorhanden)
+                        if (localStorage.getItem('bg-color') && founduser && !founduser.bgcolor) {
+                            nutzerdatenAendern(founduser.username, { bgcolor: localStorage.getItem('bg-color') });
+                            SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert');
+                        }
+
+                        SendAnalyticsStep('SDB8 besucht!')
+
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            !localStorage.getItem('bg-color') &&
+                            localStorage.getItem('displayname') &&
+                            localStorage.getItem('allowedcookies')
+                        ) {
+                            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'block';
+                                loginform4.style.display = 'none';
+                                loginform5.style.display = 'none';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            changebg(founduser.bgcolor);
+                            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
+                            return;
+                        };
+
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            localStorage.getItem('bg-color') == 'null' &&
+                            localStorage.getItem('displayname') &&
+                            localStorage.getItem('allowedcookies')
+                        ) {
+                            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'block';
+                                loginform4.style.display = 'none';
+                                loginform5.style.display = 'none';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            changebg(founduser.bgcolor);
+                            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
+                            return;
+                        };
+
+                        // Vollständig eingeloggt - Dashboard anzeigen
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            localStorage.getItem('bg-color') &&
+                            localStorage.getItem('displayname') &&
+                            localStorage.getItem('allowedcookies')
+                        ) {
+                            // Dashboard direkt anzeigen
+                            startp.style.display = 'none';
+                            if (loginContainer) {
+                                loginContainer.remove();
+                            }
+                            dashboard.style.display = 'block';
+                            setTimeout(() => {
+                                dashboard.style.opacity = '1';
+                            }, 100);
+                            bgiframe.style.transition = 'filter 2s';
+                            bgiframe.style.filter = 'saturate(1)';
+                            localStorage.setItem('showeddb', 'true');
+
+                            getTageszeit()
+                            // usname aus founduser.displayname setzen
+                            if (founduser && founduser.displayname) {
+                                usname.innerText = founduser.displayname;
+                            }
+
+                            changebg(founduser.bgcolor)
+
+                            document.getElementsByClassName('settings')[0].style.display = 'block';
+
+                            // Tutorial starten, falls noch nicht abgeschlossen
+                            setTimeout(() => {
+                                if (!localStorage.getItem('tutorial-completed') && window.released == true) {
+                                    startTutorial();
+                                    SendAnalyticsStep('Tutorial gestartet');
+                                }
+                            }, 1000);
+
+                            if (window.released == false) {
+                                document.getElementById('bg-iframe').setAttribute('src', '/');
+                                SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
+                            }
+
+                            return;
+                        }
+
+                        // Nur Username vorhanden - Passwort eingeben
+                        if (localStorage.getItem('username') &&
+                            !localStorage.getItem('password')
+                        ) {
+                            startp.innerText = 'Lass uns weitermachen!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform2.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            SendAnalyticsStep('Nutzer hat nur username, passwort frame wird nun angezeigt');
+                            return;
+                        }
+
+                        // Username und Passwort vorhanden, aber kein bg-color
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            !localStorage.getItem('bg-color')
+                        ) {
+                            startp.innerText = 'Lass uns mit der Anmeldung fortfahren!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'block';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            SendAnalyticsStep('Nutzer hat nicht bg-color, bg-color frame wird nun angezeigt');
+                            return;
+                        }
+
+                        // Username, Passwort und bg-color vorhanden, aber kein displayname
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            localStorage.getItem('bg-color') &&
+                            !localStorage.getItem('displayname')
+                        ) {
+                            startp.innerText = 'Lass uns mit deinem personalisierten Namen weitermachen!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'none';
+                                loginform4.style.display = 'block';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            changebg(founduser.bgcolor);
+                            SendAnalyticsStep('Nutzer hat nicht displayname, displayname frame wird nun angezeigt');
+                            return;
+                        }
+
+                        // Username, Passwort, bg-color und displayname vorhanden, aber kein allowedcookies
+                        if (localStorage.getItem('username') &&
+                            localStorage.getItem('password') &&
+                            localStorage.getItem('bg-color') &&
+                            localStorage.getItem('displayname') &&
+                            !localStorage.getItem('allowedcookies')
+                        ) {
+                            startp.innerText = 'Fahren wir fort!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'none';
+                                loginform4.style.display = 'none';
+                                loginform5.style.display = 'block';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            changebg(founduser.bgcolor);
+                            SendAnalyticsStep('Nutzer hat alle Daten bis auf allowedcookies, cookies frame wird nun angezeigt');
+                            return;
+                        }
+
+                        if (founduser && !founduser.bgcolor && founduser.displayname && founduser.allowedcookies
+                        ) {
+                            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
+                            setTimeout(() => {
+                                startp.style.opacity = '1';
+                            }, 10);
+                            setTimeout(() => {
+                                startp.style.transition = 'opacity 1s';
+                                startp.style.opacity = '0';
+                                loginContainer.style.display = 'block';
+                                loginform1.style.display = 'none';
+                                loginform2.style.display = 'none';
+                                loginform3.style.display = 'block';
+                                loginform4.style.display = 'none';
+                                loginform5.style.display = 'none';
+                                loginContainer.style.transition = 'opacity 1s';
+                                setTimeout(() => {
+                                    loginContainer.style.opacity = '1';
+                                }, 100);
+                                bgiframe.style.filter = 'saturate(1)';
+                                setTimeout(() => {
+                                    startp.style.display = 'none';
+                                }, 1000);
+                            }, 3000);
+                            changebg(founduser.bgcolor);
+                            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
+                            return;
+                        };
+
+                        // Kein Login-Status vorhanden - alles zurücksetzen
+                        localStorage.clear();
+                        setTimeout(() => {
+                            startp.style.opacity = '1';
+                        }, 10);
+                        setTimeout(() => {
+                            startp.style.transition = 'opacity 1s';
+                            startp.style.opacity = '0';
+                            loginContainer.style.display = 'block';
+                            loginContainer.style.transition = 'opacity 1s';
+                            setTimeout(() => {
+                                loginContainer.style.opacity = '1';
+                            }, 100);
+                            bgiframe.style.filter = 'saturate(1)';
+                            setTimeout(() => {
+                                startp.style.display = 'none';
+                            }, 1000);
+                        }, 3000);
+                        SendAnalyticsStep('Kein Login-Status vorhanden, alles zurückgesetzt');
+                    } else {
+                        console.log('Kein User gefunden');
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Fehler beim Abrufen des Users:', error);
+                });
         }
 
-        if (localStorage.getItem('password') && !localStorage.getItem('username')) {
-            if (!localStorage.getItem('errorhappened')) {
-                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername!');
-                alert('Es ist etwas Seltsames passiert! Bitte Lade die Seite neu!')
-                localStorage.setItem('errorhappened', true)
-                throw new Error('Annything strange Happened! Please refresh!')
-            } else {
-                SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername, alles wird zurückgesetzt!');
-                localStorage.clear();
-                window.location.reload();
-            }
-        }
-
-        window.founduser = founduser
-        //Admin Funktionen
-        if (founduser && founduser.username && founduser.username == 'Plus1122') {
-            //Überschrift
-            let headerlink = document.createElement('h3')
-            headerlink.innerHTML = '<u>Admin</u>';
-            linkcontainer.appendChild(headerlink);
-            //Analytics
-            let newlink1 = document.createElement('a');
-            newlink1.setAttribute('href', 'Admin/analytics.html');
-            newlink1.innerHTML = '<span>Analytics</span>'
-            linkcontainer.appendChild(newlink1);
-            //Nutzer Verwaltung
-            let newlink2 = document.createElement('a');
-            newlink2.setAttribute('href', 'Admin/user-management.html');
-            newlink2.innerHTML = '<span>Nutzer Verwaltung</span>'
-            linkcontainer.appendChild(newlink2);
-            //Einstellungen
-            let newlink3 = document.createElement('a');
-            newlink3.setAttribute('href', 'Admin/settings.html');
-            newlink3.innerHTML = '<span>Einstellungen</span>'
-            linkcontainer.appendChild(newlink3);
-            SendAnalyticsStep('Admin Funktionen hinzugefügt');
-        }
-
-        if (localStorage.getItem('allowedcookies') && founduser && !founduser.allowedcookies) {
-            window.nutzerdatenAendern(founduser.username, { 'allowedcookies': localStorage.getItem('allowedcookies') })
-            SendAnalyticsStep('allowedcookies aus localStorage in Supabase synchronisiert');
-        }
-
-        // Mobile Anpassung
-        if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            if (loginContainer) {
-                loginContainer.style.width = '80%';
-                SendAnalyticsStep('Mobile erkannt, Login Container angepasst');
-            }
-        }
-
-        // bg-color aus Supabase in localStorage synchronisieren
-        if (founduser && founduser.bgcolor && !localStorage.getItem('bg-color')) {
-            localStorage.setItem('bg-color', founduser.bgcolor);
-            SendAnalyticsStep('bg-color aus Supabase in localStorage synchronisiert');
-        }
-        // displayname aus Supabase in localStorage synchronisieren
-        if (founduser && founduser.displayname && !localStorage.getItem('displayname')) {
-            localStorage.setItem('displayname', founduser.displayname);
-            SendAnalyticsStep('displayname aus Supabase in localStorage synchronisiert');
-        }
-
-        // allowedcookies aus Supabase in localStorage synchronisieren
-        if (founduser && founduser.allowedcookies && !localStorage.getItem('allowedcookies')) {
-            localStorage.setItem('allowedcookies', 'true');
-            SendAnalyticsStep('allowedcookies aus Supabase in localStorage synchronisiert');
-        }
-
-        // bg-color aus localStorage in Supabase synchronisieren (falls nicht vorhanden)
-        if (localStorage.getItem('bg-color') && founduser && !founduser.bgcolor) {
-            nutzerdatenAendern(founduser.username, { bgcolor: localStorage.getItem('bg-color') });
-            SendAnalyticsStep('bg-color aus localStorage in Supabase synchronisiert');
-        }
-
-        SendAnalyticsStep('SDB8 besucht!')
-
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            !localStorage.getItem('bg-color') &&
-            localStorage.getItem('displayname') &&
-            localStorage.getItem('allowedcookies')
-        ) {
-            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'block';
-                loginform4.style.display = 'none';
-                loginform5.style.display = 'none';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            changebg(founduser.bgcolor);
-            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
-            return;
-        };
-
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            localStorage.getItem('bg-color') == 'null' &&
-            localStorage.getItem('displayname') &&
-            localStorage.getItem('allowedcookies')
-        ) {
-            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'block';
-                loginform4.style.display = 'none';
-                loginform5.style.display = 'none';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            changebg(founduser.bgcolor);
-            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
-            return;
-        };
-
-        // Vollständig eingeloggt - Dashboard anzeigen
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            localStorage.getItem('bg-color') &&
-            localStorage.getItem('displayname') &&
-            localStorage.getItem('allowedcookies')
-        ) {
-            // Dashboard direkt anzeigen
-            startp.style.display = 'none';
-            if (loginContainer) {
-                loginContainer.remove();
-            }
-            dashboard.style.display = 'block';
-            setTimeout(() => {
-                dashboard.style.opacity = '1';
-            }, 100);
-            bgiframe.style.transition = 'filter 2s';
-            bgiframe.style.filter = 'saturate(1)';
-            localStorage.setItem('showeddb', 'true');
-
-            getTageszeit()
-            // usname aus founduser.displayname setzen
-            if (founduser && founduser.displayname) {
-                usname.innerText = founduser.displayname;
-            }
-
-            changebg(founduser.bgcolor)
-
-            document.getElementsByClassName('settings')[0].style.display = 'block';
-
-            // Tutorial starten, falls noch nicht abgeschlossen
-            setTimeout(() => {
-                if (!localStorage.getItem('tutorial-completed') && window.released == true) {
-                    startTutorial();
-                    SendAnalyticsStep('Tutorial gestartet');
-                }
-            }, 1000);
-
-            if (window.released == false) {
-                document.getElementById('bg-iframe').setAttribute('src', '/');
-                SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
-            }
-
-            return;
-        }
-
-        // Nur Username vorhanden - Passwort eingeben
-        if (localStorage.getItem('username') &&
-            !localStorage.getItem('password')
-        ) {
-            startp.innerText = 'Lass uns weitermachen!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform2.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            SendAnalyticsStep('Nutzer hat nur username, passwort frame wird nun angezeigt');
-            return;
-        }
-
-        // Username und Passwort vorhanden, aber kein bg-color
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            !localStorage.getItem('bg-color')
-        ) {
-            startp.innerText = 'Lass uns mit der Anmeldung fortfahren!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'block';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            SendAnalyticsStep('Nutzer hat nicht bg-color, bg-color frame wird nun angezeigt');
-            return;
-        }
-
-        // Username, Passwort und bg-color vorhanden, aber kein displayname
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            localStorage.getItem('bg-color') &&
-            !localStorage.getItem('displayname')
-        ) {
-            startp.innerText = 'Lass uns mit deinem personalisierten Namen weitermachen!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'none';
-                loginform4.style.display = 'block';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            changebg(founduser.bgcolor);
-            SendAnalyticsStep('Nutzer hat nicht displayname, displayname frame wird nun angezeigt');
-            return;
-        }
-
-        // Username, Passwort, bg-color und displayname vorhanden, aber kein allowedcookies
-        if (localStorage.getItem('username') &&
-            localStorage.getItem('password') &&
-            localStorage.getItem('bg-color') &&
-            localStorage.getItem('displayname') &&
-            !localStorage.getItem('allowedcookies')
-        ) {
-            startp.innerText = 'Fahren wir fort!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'none';
-                loginform4.style.display = 'none';
-                loginform5.style.display = 'block';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            changebg(founduser.bgcolor);
-            SendAnalyticsStep('Nutzer hat alle Daten bis auf allowedcookies, cookies frame wird nun angezeigt');
-            return;
-        }
-
-        if (founduser && !founduser.bgcolor && founduser.displayname && founduser.allowedcookies
-        ) {
-            startp.innerText = 'Oh es scheint, dass dein Hintergrund fehlt. Lass uns das beheben!';
-            setTimeout(() => {
-                startp.style.opacity = '1';
-            }, 10);
-            setTimeout(() => {
-                startp.style.transition = 'opacity 1s';
-                startp.style.opacity = '0';
-                loginContainer.style.display = 'block';
-                loginform1.style.display = 'none';
-                loginform2.style.display = 'none';
-                loginform3.style.display = 'block';
-                loginform4.style.display = 'none';
-                loginform5.style.display = 'none';
-                loginContainer.style.transition = 'opacity 1s';
-                setTimeout(() => {
-                    loginContainer.style.opacity = '1';
-                }, 100);
-                bgiframe.style.filter = 'saturate(1)';
-                setTimeout(() => {
-                    startp.style.display = 'none';
-                }, 1000);
-            }, 3000);
-            changebg(founduser.bgcolor);
-            SendAnalyticsStep('Nutzer hat alle Daten bis auf bg color, bgcolor frame wird nun angezeigt');
-            return;
-        };
-
-        // Kein Login-Status vorhanden - alles zurücksetzen
-        localStorage.clear();
-        setTimeout(() => {
-            startp.style.opacity = '1';
-        }, 10);
-        setTimeout(() => {
-            startp.style.transition = 'opacity 1s';
-            startp.style.opacity = '0';
-            loginContainer.style.display = 'block';
-            loginContainer.style.transition = 'opacity 1s';
-            setTimeout(() => {
-                loginContainer.style.opacity = '1';
-            }, 100);
-            bgiframe.style.filter = 'saturate(1)';
-            setTimeout(() => {
-                startp.style.display = 'none';
-            }, 1000);
-        }, 3000);
-        SendAnalyticsStep('Kein Login-Status vorhanden, alles zurückgesetzt');
     }, 1000);
+
 }
 
 function info(title, text) {
