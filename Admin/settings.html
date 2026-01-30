@@ -445,6 +445,7 @@
 
         // Funktion zum Laden der Einstellungen
         async function ladeEinstellungen() {
+            document.getElementById("loading").style.display = "block"
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
