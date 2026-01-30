@@ -528,9 +528,11 @@ function start() {
     intro.style.opacity = '0'
     update()
     setTimeout(() => {
-        if (generalData && window.generalData.length === 0) {
-            setTimeout(() => start(), 500);
-            return;
+        if (generalData) {
+            if (generalData.length === 0) {
+                setTimeout(() => start(), 500);
+                return;
+            }
         }
 
         setTimeout(() => {
