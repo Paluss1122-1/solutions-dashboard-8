@@ -530,7 +530,7 @@ function start() {
         intro.remove()
     }, 1000);
     setTimeout(() => {
-        if (window.generalData.length === 0) {
+        if (!window.generalData ||window.generalData.length === 0) {
             setTimeout(() => start(), 500);
             return;
         }
@@ -912,9 +912,7 @@ function start() {
                     console.error('Fehler beim Abrufen des Users:', error);
                 });
         }
-
     }, 1000);
-
 }
 
 function info(title, text) {
