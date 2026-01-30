@@ -260,3 +260,5 @@ async function update() {
         console.error('Unerwarteter Fehler:', err);
     }
 }
+
+window.update = update

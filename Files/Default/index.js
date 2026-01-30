@@ -526,11 +526,12 @@ function changebg(color) {
 function start() {
     intro.style.transition = 'opacity 1s'
     intro.style.opacity = '0'
+    update()
     setTimeout(() => {
         intro.remove()
     }, 1000);
     setTimeout(() => {
-        if (!window.generalData ||window.generalData.length === 0) {
+        if (!generalData ||window.generalData.length === 0) {
             setTimeout(() => start(), 500);
             return;
         }
