@@ -428,43 +428,8 @@
     <script type="module">
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-        async function checkAccess() {
-            const username = localStorage.getItem('username');
-            const password = localStorage.getItem('password');
-            if (!username) {
-                document.body.innerHTML = `<div class="access-denied"> 
-          <h1>🚫 Zugang verweigert</h1> 
-          <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-          </div>`;
-                return false;
-            }
-            try {
-                const { data, error } =
-                    await supabase.functions.invoke('isAdmin', { body: { localusername: username, password: password }, })
-                if (!data.valid) {
-                    document.body.innerHTML = `<div class="access-denied"> 
-            <h1>🚫 Zugang verweigert</h1> 
-            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-            </div>`;
-                    return false;
-                }
-                return true;
-            }
-            catch {
-                document.body.innerHTML =
-                    `<div class="access-denied">
-            <h1>⚠️ Fehler</h1>
-            <p>Überprüfung nicht möglich.</p>
-          </div>`; return false;
-            }
-        }
-
         window.addEventListener("DOMContentLoaded", () => {
-            (async () => {
-                if (await checkAccess()) {
-                    ladeEinstellungen();
-                }
-            })();
+            ladeEinstellungen();
         });
 
         let settings = [];
@@ -481,7 +446,6 @@
         };
 
         // Funktion zum Laden der Einstellungen
-        // frontend – ersetzt checkAccess + ladeEinstellungen
         async function ladeEinstellungen() {
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
