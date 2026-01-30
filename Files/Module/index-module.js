@@ -4,7 +4,7 @@ let users = [];
 // Nutzer von Netlify Function laden
 async function ladeUsers() {
     try {
-        const response = await fetch('/.netlify/functions/get-users');
+        const response = await fetch('/.netlify/functions/SDB8/get-users');
         
         if (!response.ok) {
             console.error('Fehler beim Laden der Nutzer');
@@ -70,7 +70,7 @@ setTimeout(() => {
 // Nutzerdaten ändern über Netlify Function
 async function nutzerdatenAendern(username, neueDaten) {
     try {
-        const response = await fetch('/.netlify/functions/update-user', {
+        const response = await fetch('/.netlify/functions/SDB8/update-user', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -113,7 +113,7 @@ async function reporterror(errorMessage) {
     try {
         const userAgent = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
         
-        await fetch('/.netlify/functions/report-error', {
+        await fetch('/.netlify/functions/SDB8/report-error', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -158,7 +158,7 @@ window.SendAnalyticsStep = async function (action) {
     
     if (!isLocal) {
         try {
-            await fetch('/.netlify/functions/send-analytics', {
+            await fetch('/.netlify/functions/SDB8/send-analytics', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -180,7 +180,7 @@ window.SendAnalyticsStep = async function (action) {
 // General-Daten laden und Update-Logik
 async function update() {
     try {
-        const response = await fetch('/.netlify/functions/get-general');
+        const response = await fetch('/.netlify/functions/SDB8/get-general');
         
         if (!response.ok) {
             console.error('Fehler beim Laden der allgemeinen Daten');
