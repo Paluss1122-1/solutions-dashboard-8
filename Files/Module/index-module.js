@@ -1,5 +1,5 @@
 // Nutzer-Array
-let users = [];
+/*let users = [];
 
 // Nutzer von Netlify Function laden
 async function ladeUsers() {
@@ -35,7 +35,7 @@ async function ladeUsers() {
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
-                    } else if (users.length === 0) {
+                    } else {
                         problem.innerText = 'Es gibt aktuell Probleme mit den Servern!';
                     }
                 })
@@ -60,7 +60,7 @@ async function ladeUsers() {
 }
 
 // Lade die Nutzer beim Start
-ladeUsers();
+ladeUsers();*/
 
 // Fallback: Wenn nach 2 Sekunden keine Nutzer geladen sind, trotzdem starten
 setTimeout(() => {
@@ -86,12 +86,12 @@ async function nutzerdatenAendern(username, neueDaten) {
         const result = await response.json();
 
         // Auch im lokalen users-Array aktualisieren
-        users = users.map(user => {
+        /*users = users.map(user => {
             if (user.username === username) {
                 return { ...user, ...neueDaten };
             }
             return user;
-        });
+        });*/
 
         // Wenn der aktuell eingeloggte Nutzer geändert wurde, founduser aktualisieren
         if (window.founduser && window.founduser.username === username) {
