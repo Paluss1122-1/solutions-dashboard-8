@@ -540,7 +540,7 @@ function start() {
         }, 1000);
 
         if (localStorage.getItem('username')) {
-            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(username)}`)
+            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
                 .then(function (response) {
                     if (!response.ok) {
                         throw new Error('HTTP error! status: ' + response.status);
