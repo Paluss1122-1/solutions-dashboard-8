@@ -21,7 +21,7 @@ export async function handler(event) {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ localusername: username, password }),
+      body: JSON.stringify({ localusername: username, password: password }),
     });
 
     if (!res.ok) {
