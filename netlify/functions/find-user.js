@@ -34,7 +34,7 @@ export async function handler(event, context) {
         const { data, error } = await supabase
             .from('users')
             .select('*')
-            .eq('username', "Ali")
+            .eq('username', username)
             .limit(1)
             .maybeSingle(); // gibt null oder ein einzelnes Objekt zurück
 
