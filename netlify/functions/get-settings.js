@@ -19,7 +19,7 @@ export async function handler(event) {
             };
         }
         if (action === "save") {
-            const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/saveSettings`, {
+            const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/getSettings`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
@@ -49,7 +49,7 @@ export async function handler(event) {
             },
             body: JSON.stringify({
                 localusername: username,
-                password
+                password: password
             })
         });
 
