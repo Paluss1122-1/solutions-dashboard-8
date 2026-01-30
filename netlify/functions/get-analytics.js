@@ -24,7 +24,7 @@ export async function handler(event) {
     const limit = 50;
     const page = Number(event.queryStringParameters?.page || 0);
 
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/getAnalyticsAdmin`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/isAdmin`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
@@ -59,7 +59,7 @@ export async function handler(event) {
   } catch {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Serverfehler" }),
+      body: JSON.stringify({ error: "Serverfehler BACKEND" }),
     };
   }
 }
