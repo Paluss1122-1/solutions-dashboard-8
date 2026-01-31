@@ -112,7 +112,7 @@ window.nutzerdatenAendern = nutzerdatenAendern;
 async function reporterror(errorMessage) {
     try {
         const userAgent = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
-        
+
         await fetch('/.netlify/functions/report-error', {
             method: 'POST',
             headers: {
@@ -155,7 +155,7 @@ window.SendAnalyticsStep = async function (action) {
 
     // Prüfe, ob die Seite nicht lokal läuft
     const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-    
+
     if (!isLocal) {
         try {
             await fetch('/.netlify/functions/send-analytics', {
@@ -180,8 +180,15 @@ window.SendAnalyticsStep = async function (action) {
 // General-Daten laden und Update-Logik
 async function update() {
     try {
-        const response = await fetch('/.netlify/functions/get-general');
+        const start = performance.now();
         
+        const response = await fetch('/.netlify/functions/get-general');
+
+        const end = performance.now();
+        const dauerMs = end - start;
+
+        console.log(`⏱️ Dauer: ${dauerMs.toFixed(2)} ms`);
+
         if (!response.ok) {
             console.error('Fehler beim Laden der allgemeinen Daten');
             return;
