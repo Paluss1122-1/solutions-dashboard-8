@@ -40,10 +40,6 @@
             left: 50%;
             transform: translate(-50%, -20%);
             pointer-events: none;
-<<<<<<< HEAD
-            /* alles durchlassen */
-=======
->>>>>>> f82147d4f8f55c37acbad4ea4be07262f30092bd
         }
 
         .buttons button {
@@ -388,40 +384,27 @@
         }
 
         window.SendAnalyticsStep = async function (action) {
-            let user = null;
-            try {
-                user = localStorage.getItem('username');
-            } catch (e) {
-                console.error("Fehler beim Auslesen des Benutzernamens:", e);
-                user = null;
-            }
+            let user = window.founduser || localStorage.getItem('username') || null;
 
             const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-            if (isLocal) {
+
+            if (!isLocal) {
                 try {
-                    const { error } = await supabase.from('analytics').insert([{
-                        browser: getBrowserName(),
-                        device: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                        datum: new Date().toISOString(),
-                        link: window.location.href,
-                        username: user,
-                        Action: action
-                    }]);
-                    if (error) {
-                        await supabase.from('Fehlerberichte').insert([{
-                            userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                            zeit: new Date().toISOString(),
-                            fehler: error.message || error
-                        }]);
-                        console.log(error.message)
-                    }
+                    await fetch('/.netlify/functions/send-analytics', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            browser: getBrowserName(),
+                            device: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
+                            link: window.location.href,
+                            username: user,
+                            action: action
+                        })
+                    });
                 } catch (err) {
-                    await supabase.from('Fehlerberichte').insert([{
-                        userAgent: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
-                        zeit: new Date().toISOString(),
-                        fehler: err.message || err
-                    }]);
-                    console.log(err)
+                    console.error('Fehler beim Senden der Analytics:', err);
                 }
             }
         }
@@ -467,53 +450,51 @@
                 .select('*')
                 .single();
 
-            if (data.released === false) {
-                let showMaintenance = false;
-                const active = data && data.Wartungsarbeiten;
+            let showMaintenance = false;
+            const active = data && data.Wartungsarbeiten;
 
-                if (founduser) {
-                    try {
-                        if (founduser.username === "Paluss1122" && active) {
-                            showMaintenance = false;
-                            document.title = 'Mathe Lösungen';
-                        } else {
-                            document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                            showMaintenance = active;
-                        }
-                    } catch (e) {
-                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                        console.error("Fehler beim Parsen des Benutzers:", e);
-                        showMaintenance = active;
-                    }
-                } else if (localStorage.getItem('username')) {
-                    if (localStorage.getItem('username') === "Paluss1122" && active) {
+            if (founduser) {
+                try {
+                    if (founduser.username === "Paluss1122" && active) {
                         showMaintenance = false;
                         document.title = 'Mathe Lösungen';
                     } else {
                         document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                         showMaintenance = active;
                     }
+                } catch (e) {
+                    document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                    console.error("Fehler beim Parsen des Benutzers:", e);
+                    showMaintenance = active;
+                }
+            } else if (localStorage.getItem('username')) {
+                if (localStorage.getItem('username') === "Paluss1122" && active) {
+                    showMaintenance = false;
+                    document.title = 'Mathe Lösungen';
                 } else {
                     document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                     showMaintenance = active;
                 }
-
-                const maintenanceFrame = document.getElementById("maintenance-frame");
-                if (maintenanceFrame) {
-                    if (showMaintenance === true) {
-                        maintenanceFrame.style.display = 'flex';
-                        maintenanceFrame.style.opacity = '1';
-                    } else {
-                        maintenanceFrame.style.opacity = '1';
-                        setTimeout(() => {
-                            maintenanceFrame.style.display = 'none';
-                        }, 1000);
-                    }
-                }
-
-                document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
-                document.getElementById("why-ws").innerText = data.Grund;
+            } else {
+                document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                showMaintenance = active;
             }
+
+            const maintenanceFrame = document.getElementById("maintenance-frame");
+            if (maintenanceFrame) {
+                if (showMaintenance === true) {
+                    maintenanceFrame.style.display = 'flex';
+                    maintenanceFrame.style.opacity = '1';
+                } else {
+                    maintenanceFrame.style.opacity = '1';
+                    setTimeout(() => {
+                        maintenanceFrame.style.display = 'none';
+                    }, 1000);
+                }
+            }
+
+            document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
+            document.getElementById("why-ws").innerText = data.Grund;
         }
 
 
@@ -596,8 +577,6 @@
         </button>
     </div>
     <script>
-<<<<<<< HEAD
-=======
         function checkAccess() {
             const username = localStorage.getItem('username');
             if (!username && location.hostname !== '127.0.0.1') {
@@ -618,7 +597,6 @@
         if (!checkAccess()) {
             throw new Error('Zugang verweigert');
         }
->>>>>>> f82147d4f8f55c37acbad4ea4be07262f30092bd
     </script>
     <script>
         const workbookImage = document.getElementById('workbookImage');
