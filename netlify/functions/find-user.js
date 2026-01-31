@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-export async function handler(event, context) {
+export async function handler(event, _) {
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -13,7 +13,6 @@ export async function handler(event, context) {
     }
 
     try {
-        // Username aus Query-Parameter oder Body holen
         const username = event.httpMethod === 'GET'
             ? event.queryStringParameters?.username
             : JSON.parse(event.body || '{}').username;
