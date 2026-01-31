@@ -9,7 +9,7 @@ async function nutzerdatenAendern(username, neueDaten) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 username: 'Plus1122',
                 password: '123Maths!',
                 updateUser: username,
@@ -56,7 +56,6 @@ async function reporterror(errorMessage) {
 
 window.reporterror = reporterror;
 
-// Browser-Erkennung
 function getBrowserName() {
     const userAgent = navigator.userAgent;
 
@@ -72,17 +71,8 @@ function getBrowserName() {
 
 // Analytics über Netlify Function senden
 window.SendAnalyticsStep = async function (action) {
-    let user = null;
-    if (window.founduser || localStorage.getItem('username')) {
-        try {
-            user = localStorage.getItem('username');
-        } catch (e) {
-            console.error("Fehler beim Auslesen des Benutzernamens:", e);
-            user = null;
-        }
-    }
+    let user = window.founduser || localStorage.getItem('username') || null;
 
-    // Prüfe, ob die Seite nicht lokal läuft
     const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
     if (!isLocal) {
@@ -106,7 +96,6 @@ window.SendAnalyticsStep = async function (action) {
     }
 }
 
-// General-Daten laden und Update-Logik
 async function update() {
     try {
         const response = await fetch('/.netlify/functions/get-general');
@@ -120,71 +109,51 @@ async function update() {
         window.generalData = data;
         window.released = data.released;
 
-        if (data.released !== false) {
-            let showMaintenance = false;
-            const active = data && data.Wartungsarbeiten;
+        let showMaintenance = false;
+        const active = data && data.Wartungsarbeiten;
 
-            if (window.founduser) {
-                try {
-                    if (window.founduser.username === "Plus1122" && active) {
-                        showMaintenance = false;
-                        document.title = 'Dashboard';
-                    } else {
-                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                        showMaintenance = active;
-                    }
-                } catch (e) {
-                    document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                    console.error("Fehler beim Parsen des Benutzers:", e);
-                    showMaintenance = active;
-                }
-            } else if (localStorage.getItem('username')) {
-                if (localStorage.getItem('username') === "Plus1122" && active) {
+        if (window.founduser) {
+            try {
+                if (window.founduser.username === "Plus1122" && active) {
                     showMaintenance = false;
                     document.title = 'Dashboard';
                 } else {
                     document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                     showMaintenance = active;
                 }
+            } catch (e) {
+                document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                console.error("Fehler beim Parsen des Benutzers:", e);
+                showMaintenance = active;
+            }
+        } else if (localStorage.getItem('username')) {
+            if (localStorage.getItem('username') === "Plus1122" && active) {
+                showMaintenance = false;
+                document.title = 'Dashboard';
             } else {
                 document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                 showMaintenance = active;
             }
-
-            const maintenanceFrame = document.getElementById("maintenance-frame");
-            if (maintenanceFrame) {
-                if (showMaintenance === true) {
-                    maintenanceFrame.style.display = 'flex';
-                    maintenanceFrame.style.opacity = '1';
-                } else {
-                    maintenanceFrame.style.opacity = '0';
-                    setTimeout(() => {
-                        maintenanceFrame.style.display = 'none';
-                    }, 1000);
-                }
-            }
-
-            document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
-            document.getElementById("why-ws").innerText = data.Grund;
-        }
-
-        // Falls Released == false -> Countdown anzeigen
-        if (data.released === false) {
-            const countdown = document.getElementById('countdown');
-            countdown.style.zIndex = '10000';
-
-            // Zielzeit für Countdown global setzen
-            if (data.releasedate) {
-                window.releaseTimestamp = new Date(data.releasedate).getTime();
-            }
-
-            startCountdown();
         } else {
-            const countdown = document.getElementById('countdown');
-            if (countdown) {
-                countdown.remove();
+            document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+            showMaintenance = active;
+        }
+
+        const maintenanceFrame = document.getElementById("maintenance-frame");
+        if (maintenanceFrame) {
+            if (showMaintenance === true) {
+                maintenanceFrame.style.display = 'flex';
+                maintenanceFrame.style.opacity = '1';
+            } else {
+                maintenanceFrame.style.opacity = '0';
+                setTimeout(() => {
+                    maintenanceFrame.style.display = 'none';
+                }, 1000);
             }
         }
+
+        document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
+        document.getElementById("why-ws").innerText = data.Grund;
     } catch (err) {
         console.error('Unerwarteter Fehler:', err);
     }
