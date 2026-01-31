@@ -448,12 +448,19 @@
             document.getElementById("loading").style.display = "block"
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
+            
+            const start = performance.now();
 
             const res = await fetch("/.netlify/functions/get-settings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
+
+            const end = performance.now();
+            const dauerMs = end - start;
+
+            console.log(`⏱️ Dauer: ${dauerMs.toFixed(2)} ms`);
 
             if (!res.ok) {
                 document.body.innerHTML = `
