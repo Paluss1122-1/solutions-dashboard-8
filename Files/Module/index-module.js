@@ -174,14 +174,7 @@ window.SendAnalyticsStep = async function (action) {
 // General-Daten laden und Update-Logik
 async function update() {
     try {
-        const start = performance.now();
-        
         const response = await fetch('/.netlify/functions/get-general');
-
-        const end = performance.now();
-        const dauerMs = end - start;
-
-        console.log(`⏱️ Dauer: ${dauerMs.toFixed(2)} ms`);
 
         if (!response.ok) {
             console.error('Fehler beim Laden der allgemeinen Daten');
