@@ -471,9 +471,6 @@
 
             document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
             document.getElementById("why-ws").innerText = data.Grund;
-
-            preloadImages();
-            updatePage();
         }
 
         function ladeNutzer() {
@@ -487,6 +484,8 @@
                 .then(function (result) {
                     if (result.user && result.user !== null) {
                         founduser = result.user
+                        preloadImages();
+                        updatePage();
                         wartungsarbeiten()
                     } else {
                         document.body.innerHTML = `
