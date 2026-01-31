@@ -167,6 +167,21 @@
         .jump:hover {
             transform: scale(1.1);
         }
+
+        .access-denied {
+            text-align: center;
+            padding: 50px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 10px;
+            margin: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .access-denied h1 {
+            color: #721c24;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         const pageRanges = {
@@ -367,8 +382,6 @@
         };
     </script>
     <script type="module">
-        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
         function getBrowserName() {
             const userAgent = navigator.userAgent;
             if (userAgent.includes("Firefox")) return "Firefox";
@@ -405,29 +418,14 @@
         }
 
         SendAnalyticsStep('Mathe besucht!')
-        let founduser = null
 
-        // Funktion zum Laden der Nutzer
-        function ladeNutzer() {
-            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
-                .then(function (response) {
-                    if (!response.ok) {
-                        throw new Error('HTTP error! status: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(function (result) {
-                    if (result.user) founduser = result.user;
-                })
-        }
-
-        ladeNutzer()
-
-        /*async function wartungsarbeiten() {
-            const { data, error } = await supabase
-                .from('general')
-                .select('*')
-                .single();
+        async function wartungsarbeiten() {
+            const response = await fetch('/.netlify/functions/get-general');
+            if (!response.ok) {
+                console.error('Fehler beim Laden der allgemeinen Daten');
+                return;
+            }
+            const data = await response.json();
 
             let showMaintenance = false;
             const active = data && data.Wartungsarbeiten;
@@ -475,20 +473,33 @@
             document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
             document.getElementById("why-ws").innerText = data.Grund;
         }
+        let founduser = null
 
+        // Funktion zum Laden der Nutzer
+        function ladeNutzer() {
+            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (result) {
+                    if (result.user && result.user !== null) {
+                        founduser = result.user
+                    } else {
+                        document.body.innerHTML = `
+                            <div class="access-denied">
+                            <h1>🚫 Zugang verweigert</h1>
+                            <p>Keine Berechtigung.</p>
+                            </div>
+                        `;
+                    }
+                    wartungsarbeiten()
+                })
+        }
 
-        function checkAccess() {
-            const username = localStorage.getItem('username');
-            if (!username) {
-                document.body.innerHTML = `<div class="access-denied">
-                    <h1>🚫 Zugang verweigert</h1>
-                    <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-                    <p>Du musst angemeldet sein!</p>
-                    <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-                </div>; return false;`
-            }
-            return true;
-        }*/ // Zugangskontrolle beim Laden der Seite if (!checkAccess()) { throw new Error('Zugang verweigert'); }
+        ladeNutzer()
     </script>
 </head>
 
@@ -555,28 +566,6 @@
             Weiter
         </button>
     </div>
-    <script>
-        function checkAccess() {
-            const username = localStorage.getItem('username');
-            if (!username && location.hostname !== '127.0.0.1') {
-                document.body.innerHTML = `
-          <div class="access-denied">
-            <h1>🚫 Zugang verweigert</h1>
-            <p>Du hast keine Berechtigung, diese Seite zu besuchen.</p>
-            <p>Du musst angemeldet sein!</p>
-            <p>Aktueller Benutzer: ${username || 'Nicht angemeldet'}</p>
-          </div>
-        `;
-                return false;
-            }
-            return true;
-        }
-
-        // Zugangskontrolle beim Laden der Seite
-        if (!checkAccess()) {
-            throw new Error('Zugang verweigert');
-        }
-    </script>
     <script>
         const workbookImage = document.getElementById('workbookImage');
 
