@@ -1112,16 +1112,7 @@ loginform2.onsubmit = function (event) {
                         usname.innerText = founduser.displayname;
                     }
 
-                    // Tutorial starten, falls noch nicht abgeschlossen
-
-                    if (window.released == false) {
-                        document.getElementById('bg-iframe').setAttribute('src', '/');
-                        SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
-                    }
-
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 2000);
+                    window.location.reload()
                 }, 3000);
             }
         }, 500);
