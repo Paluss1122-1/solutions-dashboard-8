@@ -1,7 +1,10 @@
 {
   "name": "sdb8",
-  "version": ">=18",
+  "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
   }
