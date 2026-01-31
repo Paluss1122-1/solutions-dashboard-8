@@ -240,141 +240,125 @@
         };
     </script>
     <script type="module">
-        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-        const supabaseUrl = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-        const supabaseKey = 'sb_publishable_aTwBvGnNtosusrlawR6rHQ_anwwpfR6';
-
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        async function goToActualPage() {
-            try {
-                const { data, error } = await supabase
-                    .from('general') // Wähle die Tabelle "general" aus
-                    .select('Latein') // Hole die Spalte "Latein"
-                    .single(); // Es gibt nur eine Zeile, daher direkt .single()
-
-                if (error) {
-                    console.error("Supabase Fehler:", error);
-                    alert("Fehler beim Laden der Daten!");
-                    return;
-                }
-
-                if (data && data.Latein) {
-                    const pageNumber = parseInt(data.Latein);
-                    if (!isNaN(pageNumber) && pageNumber > 0 && pageNumber <= totalPages) {
-                        currentPage = pageNumber;
-                        if (!imageElement || !pageNumberElement || !prevButton || !nextButton) {
-                            initializeElements();
-                        }
-                        preloadImages();
-                        updatePage();
-                    } else {
-                        alert("Ungültige Seitennummer in der Datenbank!");
-                    }
-                } else {
-                    alert("Keine Daten gefunden!");
-                }
-            } catch (error) {
-                console.error("Fehler beim Abrufen der Seite:", error);
-                alert("Fehler beim Laden der Seite!");
-            }
+        let founduser
+        function getBrowserName() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes("Firefox")) return "Firefox";
+            if (userAgent.includes("Chrome")) return "Chrome";
+            if (userAgent.includes("Safari")) return "Safari";
+            if (userAgent.includes("Edge")) return "Edge";
+            return "Unknown";
         }
 
-        window.goToActualPage = goToActualPage;
+        window.SendAnalyticsStep = async function (action) {
+            let user = window.founduser || localStorage.getItem('username') || null;
 
-        window.addEventListener("DOMContentLoaded", () => {
-            const jumpButton = document.querySelector('.jump');
-            if (jumpButton) {
-                jumpButton.addEventListener('click', goToActualPage);
-            }
-        });
+            const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
-        let users = [];
-        let founduser = null
-
-        // Funktion zum Laden der Nutzer
-        async function ladeNutzer() {
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('username, password, displayname, allowedcookies, bgcolor');
-
-                if (error) {
-                    throw new Error(`Fehler beim Laden der Nutzer: ${error.message}`);
-                }
-
-                users = data || [];
-
-                if (localStorage.getItem('username')) {
-                    users.forEach(function (user) {
-                        if (user.username === localStorage.getItem('username')) {
-                            founduser = user;
-                        }
+            if (!isLocal) {
+                try {
+                    await fetch('/.netlify/functions/send-analytics', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            browser: getBrowserName(),
+                            device: (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent,
+                            link: window.location.href,
+                            username: user,
+                            action: action
+                        })
                     });
+                } catch (err) {
+                    console.error('Fehler beim Senden der Analytics:', err);
                 }
-
-                wartungsarbeiten()
-
-            } catch (error) {
-                console.log(error)
             }
         }
 
-        ladeNutzer()
+        SendAnalyticsStep('Latein besucht!')
 
         async function wartungsarbeiten() {
-            const { data, error } = await supabase
-                .from('general')
-                .select('*')
-                .single();
+            const response = await fetch('/.netlify/functions/get-general');
+            if (!response.ok) {
+                console.error('Fehler beim Laden der allgemeinen Daten');
+                return;
+            }
+            const data = await response.json();
 
             let showMaintenance = false;
-                const active = data && data.Wartungsarbeiten;
+            const active = data && data.Wartungsarbeiten;
 
-                if (founduser) {
-                    try {
-                        if (founduser.username === "Plus1122" && active) {
-                            showMaintenance = false;
-                            document.title = 'Latein Vokabeln';
-                        } else {
-                            document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                            showMaintenance = active;
-                        }
-                    } catch (e) {
-                        document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
-                        console.error("Fehler beim Parsen des Benutzers:", e);
-                        showMaintenance = active;
-                    }
-                } else if (localStorage.getItem('username')) {
-                    if (localStorage.getItem('username') === "Plus1122" && active) {
+            if (founduser && founduser !== null) {
+                try {
+                    if (founduser.username === "Plus1122" && active) {
                         showMaintenance = false;
-                        document.title = 'Latein Vokabeln';
+                        document.title = 'Latein Lösungen';
                     } else {
                         document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                         showMaintenance = active;
                     }
+                } catch (e) {
+                    document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                    console.error("Fehler beim Parsen des Benutzers:", e);
+                    showMaintenance = active;
+                }
+            } else if (localStorage.getItem('username')) {
+                if (localStorage.getItem('username') === "Plus1122" && active) {
+                    showMaintenance = false;
+                    document.title = 'Mathe Lösungen';
                 } else {
                     document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
                     showMaintenance = active;
                 }
+            } else {
+                document.title = active ? `Wartungsarbeiten (bis ${data.WartungsarbeitenZeit})` : "Dashboard";
+                showMaintenance = active;
+            }
 
-                const maintenanceFrame = document.getElementById("maintenance-frame");
-                if (maintenanceFrame) {
-                    if (showMaintenance === true) {
-                        maintenanceFrame.style.display = 'flex';
-                        maintenanceFrame.style.opacity = '1';
-                    } else {
-                        maintenanceFrame.style.opacity = '1';
-                        setTimeout(() => {
-                            maintenanceFrame.style.display = 'none';
-                        }, 1000);
-                    }
+            const maintenanceFrame = document.getElementById("maintenance-frame");
+            if (maintenanceFrame) {
+                if (showMaintenance === true) {
+                    maintenanceFrame.style.display = 'flex';
+                    maintenanceFrame.style.opacity = '1';
+                } else {
+                    maintenanceFrame.style.opacity = '1';
+                    setTimeout(() => {
+                        maintenanceFrame.style.display = 'none';
+                    }, 1000);
                 }
+            }
 
-                document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
-                document.getElementById("why-ws").innerText = data.Grund;
+            document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
+            document.getElementById("why-ws").innerText = data.Grund;
         }
+
+        function ladeNutzer() {
+            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (result) {
+                    if (result.user && result.user !== null) {
+                        founduser = result.user
+                        preloadImages();
+                        updatePage();
+                        wartungsarbeiten()
+                    } else {
+                        document.body.innerHTML = `
+                            <div class="access-denied">
+                            <h1>🚫 Zugang verweigert</h1>
+                            <p>Keine Berechtigung.</p>
+                            </div>
+                        `;
+                    }
+                })
+        }
+
+        ladeNutzer()
     </script>
 </head>
 
