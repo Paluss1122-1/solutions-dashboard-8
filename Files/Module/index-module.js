@@ -67,31 +67,25 @@ setTimeout(() => {
     start();
 }, 2000);
 
-// Nutzerdaten ändern über Netlify Function
 async function nutzerdatenAendern(username, neueDaten) {
     try {
-        const response = await fetch('/.netlify/functions/update-user', {
+        const response = await fetch('/.netlify/functions/user-management', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, neueDaten })
+            body: JSON.stringify({ 
+                username: 'Plus1122',
+                password: '123Maths!',
+                updateUser: username,
+                neueDaten: neueDaten
+            })
         });
 
         if (!response.ok) {
             console.error('Fehler beim Aktualisieren der Nutzerdaten');
             return false;
         }
-
-        const result = await response.json();
-
-        // Auch im lokalen users-Array aktualisieren
-        /*users = users.map(user => {
-            if (user.username === username) {
-                return { ...user, ...neueDaten };
-            }
-            return user;
-        });*/
 
         // Wenn der aktuell eingeloggte Nutzer geändert wurde, founduser aktualisieren
         if (window.founduser && window.founduser.username === username) {
@@ -204,7 +198,7 @@ async function update() {
 
             if (window.founduser) {
                 try {
-                    if (window.founduser.username === "Paluss1122" && active) {
+                    if (window.founduser.username === "Plus1122" && active) {
                         showMaintenance = false;
                         document.title = 'Dashboard';
                     } else {
@@ -217,7 +211,7 @@ async function update() {
                     showMaintenance = active;
                 }
             } else if (localStorage.getItem('username')) {
-                if (localStorage.getItem('username') === "Paluss1122" && active) {
+                if (localStorage.getItem('username') === "Plus1122" && active) {
                     showMaintenance = false;
                     document.title = 'Dashboard';
                 } else {
