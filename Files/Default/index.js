@@ -528,11 +528,14 @@ function start() {
     intro.style.opacity = '0'
     update()
     setTimeout(() => {
-        if (generalData) {
-            if (generalData.length === 0) {
-                setTimeout(() => start(), 500);
-                return;
-            }
+        if (typeof generalData === "undefined") {
+            setTimeout(() => start(), 500);
+            return;
+        }
+
+        if (generalData.length === 0) {
+            setTimeout(() => start(), 500);
+            return;
         }
 
         setTimeout(() => {
@@ -721,9 +724,8 @@ function start() {
 
                             document.getElementsByClassName('settings')[0].style.display = 'block';
 
-                            // Tutorial starten, falls noch nicht abgeschlossen
                             setTimeout(() => {
-                                if (!localStorage.getItem('tutorial-completed') && window.released == true) {
+                                if (!localStorage.getItem('tutorial-completed') && generalData.Wartungsarbeiten == false) {
                                     startTutorial();
                                     SendAnalyticsStep('Tutorial gestartet');
                                 }
