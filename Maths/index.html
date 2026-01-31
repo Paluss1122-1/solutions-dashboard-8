@@ -360,7 +360,6 @@
                 return;
             }
 
-            // Fall 2: Normale Seitennummer
             const newPage = parseInt(pageInput);
             if (newPage >= 1 && newPage <= totalPages) {
                 currentPage = newPage;
@@ -369,6 +368,8 @@
             }
         }
 
+        window.preloadImages = preloadImages
+        window.updatePage = updatePage
         window.onload = () => {
             initializeElements();
 
@@ -376,9 +377,6 @@
             if (lp) {
                 currentPage = parseInt(lp);
             }
-
-            preloadImages();
-            updatePage();
         };
     </script>
     <script type="module">
@@ -472,10 +470,11 @@
 
             document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
             document.getElementById("why-ws").innerText = data.Grund;
-        }
-        let founduser = null
 
-        // Funktion zum Laden der Nutzer
+            preloadImages();
+            updatePage();
+        }
+
         function ladeNutzer() {
             fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
                 .then(function (response) {
@@ -486,7 +485,8 @@
                 })
                 .then(function (result) {
                     if (result.user && result.user !== null) {
-                        founduser = result.user
+                        window.founduser = result.user
+                        document.getElementById("workbookImage").setAttribute("src", "pictures/1.jpg")
                     } else {
                         document.body.innerHTML = `
                             <div class="access-denied">
@@ -523,7 +523,7 @@
         </h2>
 
         <p id='tutorial-text' style='font-size: 18px; line-height: 1.5; margin-bottom: 25px;'>
-            Bestätige bitte hiermit, dass du keine Screenshots machst, wenn doch du Zugang verlierst für immer
+            Bestätige bitte hiermit, dass du keine Screenshots machst, wenn doch verlierst du Zugang für immer
         </p>
 
         <div style='display: flex; justify-content: center; gap: 10px;'>
@@ -548,7 +548,7 @@
 
     <div class="container" id="container">
         <h1>Mathe Lösungen</h1>
-        <img id="workbookImage" src="pictures/1.jpg" alt="Workbook Seite 1">
+        <img id="workbookImage" src="" alt="Workbook Seite 1">
 
         <div class="manual-navigation" style="z-index: 1000;">
             <input class="normal" style="width: 90%;" type="text" id="pageInput"
