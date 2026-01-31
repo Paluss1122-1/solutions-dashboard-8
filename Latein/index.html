@@ -329,8 +329,7 @@
                 .select('*')
                 .single();
 
-            if (data.released === false) {
-                let showMaintenance = false;
+            let showMaintenance = false;
                 const active = data && data.Wartungsarbeiten;
 
                 if (founduser) {
@@ -375,7 +374,6 @@
 
                 document.getElementById("time-ws").innerText = data.WartungsarbeitenZeit;
                 document.getElementById("why-ws").innerText = data.Grund;
-            }
         }
     </script>
 </head>
