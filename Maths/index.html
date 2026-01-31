@@ -368,11 +368,6 @@
     </script>
     <script type="module">
         import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-        import { supabaseKey } from "./config.js";
-
-        const supabaseUrl = 'https://empsgwnjxxhzyudvxyxg.supabase.co';
-
-        const supabase = createClient(supabaseUrl, supabaseKey);
 
         function getBrowserName() {
             const userAgent = navigator.userAgent;
@@ -410,41 +405,25 @@
         }
 
         SendAnalyticsStep('Mathe besucht!')
-
-        let users = [];
         let founduser = null
 
         // Funktion zum Laden der Nutzer
-        async function ladeNutzer() {
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('username, password, displayname, allowedcookies, bgcolor');
-
-                if (error) {
-                    throw new Error(`Fehler beim Laden der Nutzer: ${error.message}`);
-                }
-
-                users = data || [];
-
-                if (localStorage.getItem('username')) {
-                    users.forEach(function (user) {
-                        if (user.username === localStorage.getItem('username')) {
-                            founduser = user;
-                        }
-                    });
-                }
-
-                wartungsarbeiten()
-
-            } catch (error) {
-                console.log(error)
-            }
+        function ladeNutzer() {
+            fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (result) {
+                    if (result.user) founduser = result.user;
+                })
         }
 
         ladeNutzer()
 
-        async function wartungsarbeiten() {
+        /*async function wartungsarbeiten() {
             const { data, error } = await supabase
                 .from('general')
                 .select('*')
@@ -509,7 +488,7 @@
                 </div>; return false;`
             }
             return true;
-        } // Zugangskontrolle beim Laden der Seite if (!checkAccess()) { throw new Error('Zugang verweigert'); }
+        }*/ // Zugangskontrolle beim Laden der Seite if (!checkAccess()) { throw new Error('Zugang verweigert'); }
     </script>
 </head>
 
