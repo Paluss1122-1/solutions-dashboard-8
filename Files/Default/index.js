@@ -550,7 +550,6 @@ function start() {
                 .then(function (result) {
                     if (result.user) {
                         founduser = result.user;
-                        console.log('User gefunden:', founduser);
                         if (localStorage.getItem('password') && !localStorage.getItem('username')) {
                             if (!localStorage.getItem('errorhappened')) {
                                 SendAnalyticsStep('Fehlerhafter Zustand: Passwort ohne Nutzername!');
