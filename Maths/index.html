@@ -380,6 +380,7 @@
         };
     </script>
     <script type="module">
+        let founduser
         function getBrowserName() {
             const userAgent = navigator.userAgent;
             if (userAgent.includes("Firefox")) return "Firefox";
@@ -428,7 +429,7 @@
             let showMaintenance = false;
             const active = data && data.Wartungsarbeiten;
 
-            if (founduser) {
+            if (founduser && founduser !== null) {
                 try {
                     if (founduser.username === "Plus1122" && active) {
                         showMaintenance = false;
@@ -485,7 +486,7 @@
                 })
                 .then(function (result) {
                     if (result.user && result.user !== null) {
-                        window.founduser = result.user
+                        founduser = result.user
                         document.getElementById("workbookImage").setAttribute("src", "pictures/1.jpg")
                     } else {
                         document.body.innerHTML = `
