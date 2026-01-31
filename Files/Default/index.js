@@ -524,8 +524,6 @@ function changebg(color) {
 
 
 function start() {
-    intro.style.transition = 'opacity 1s'
-    intro.style.opacity = '0'
     update()
     setTimeout(() => {
         if (typeof generalData === "undefined") {
@@ -538,10 +536,6 @@ function start() {
             return;
         }
 
-        setTimeout(() => {
-            intro.remove()
-        }, 1000);
-
         if (localStorage.getItem('username')) {
             fetch(`/.netlify/functions/find-user?username=${encodeURIComponent(localStorage.getItem('username'))}`)
                 .then(function (response) {
@@ -552,6 +546,11 @@ function start() {
                 })
                 .then(function (result) {
                     if (result.user) {
+                        intro.style.transition = 'opacity 1s'
+                        intro.style.opacity = '0'
+                        setTimeout(() => {
+                            intro.remove()
+                        }, 1000);
                         founduser = result.user;
                         if (localStorage.getItem('password') && !localStorage.getItem('username')) {
                             if (!localStorage.getItem('errorhappened')) {
@@ -730,12 +729,6 @@ function start() {
                                     SendAnalyticsStep('Tutorial gestartet');
                                 }
                             }, 1000);
-
-                            if (window.released == false) {
-                                document.getElementById('bg-iframe').setAttribute('src', '/');
-                                SendAnalyticsStep('Noch nicht released also scource von bg iframe "/"');
-                            }
-
                             return;
                         }
 
