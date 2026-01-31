@@ -488,6 +488,7 @@
                     if (result.user && result.user !== null) {
                         founduser = result.user
                         document.getElementById("workbookImage").setAttribute("src", "pictures/1.jpg")
+                        wartungsarbeiten()
                     } else {
                         document.body.innerHTML = `
                             <div class="access-denied">
@@ -496,7 +497,6 @@
                             </div>
                         `;
                     }
-                    wartungsarbeiten()
                 })
         }
 
